@@ -12,7 +12,7 @@ class Main
 public:
     Main() {}
 
-    static void run() {
+    static void run() {//runs code
         std::cout << "main: inicio\n";
 
         ContextMain = new CPU::Context();

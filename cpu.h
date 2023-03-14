@@ -16,12 +16,12 @@ class CPU
         private:
             static const unsigned int STACK_SIZE = Traits<CPU>::STACK_SIZE;
         public:
-            Context() { _stack = 0; }
+            Context() { _stack = 0; } //declaração do construtor, stack padrão com tamanho 0
 
             template<typename ... Tn>
-            Context(void (* func)(Tn ...), Tn ... an);
+            Context(void (* func)(Tn ...), Tn ... an); //??
 
-            ~Context();
+            ~Context(); //destrutor
 
             void save();
             void load();
@@ -29,7 +29,7 @@ class CPU
         private:            
             char *_stack;
         public:
-            ucontext_t _context;
+            ucontext_t _context; //posix native
         };
 
     public:
