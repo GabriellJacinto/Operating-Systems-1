@@ -19,7 +19,7 @@ class CPU
             Context() { _stack = 0; } //declaração do construtor, stack padrão com tamanho 0
 
             template<typename ... Tn>
-            Context(void (* func)(Tn ...), Tn ... an); //??
+            Context(void (* func)(Tn ...), Tn ... an); //*args **kwargs
 
             ~Context(); //destrutor
 
