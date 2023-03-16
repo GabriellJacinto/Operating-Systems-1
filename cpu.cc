@@ -18,16 +18,18 @@ void CPU::Context::load()
 
 CPU::Context::~Context()
 {
-    //cout << "Thread " << PID << "destruída"<<endl;
+    if (this->_stack != 0) // Se o valor apontado por _stack for diferente de 0, esse valor não será destruído no destructor padrão. 
+                           // Embora o ponteiro seja destruído, o valor apontado não é. 
+    {
+        delete this->_stack;
+    }
 }
 
 int CPU::switch_context(Context *from, Context *to)
 {
-    //troca o contexto usando os dois
-    //contextos recebidos como parâmetro (de “from” para “to”) e retornar 0 caso seja bem sucedido
-    //ou negativo caso aconteça um erro.
-
-    
+    ucontext_t * currentContextPtr = &from->_context;
+    ucontext_t * nextContextPtr = &to->_context;
+    int swapWorked = swapcontext(currentContextPtr, nextContextPtr);
 }
 
 __END_API
