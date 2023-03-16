@@ -5,7 +5,5 @@
 
 using namespace std;
 
-Time::Time()
-{
-    hour=minute=second=0;
-}
+Time time = Time( 12, 35, 47 );
+

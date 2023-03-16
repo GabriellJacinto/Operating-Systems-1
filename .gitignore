@@ -2,3 +2,5 @@ __pycache__/
 #tutorial/
 .vscode/
 .codecarbon.config
+.vscode/settings.json
+tutorial/exemplo-1/exemplo-2.cc
