@@ -5,14 +5,15 @@ __BEGIN_API
 
 void CPU::Context::save()
 {
-    //adicionar implementação
-    //set_context
+    ucontext_t * contextToSavePtr = &this->_context;
+    getcontext(contextToSavePtr);
 }
 
 void CPU::Context::load()
 {
-    //adicionar implementação
-    //get_context
+    ucontext_t * contextToLoadPtr = &this->_context;
+    setcontext(contextToLoadPtr);
+
 }
 
 CPU::Context::~Context()
