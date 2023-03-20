@@ -27,7 +27,7 @@ class CPU
                 setContextStack(); 
 
                 ucontext_t *newContextPtr =  &this->_context;
-                makecontext(newContextPtr, void (*func)(), sizeof...(Tn), an...); // Cria o novo contexto.
+                makecontext(newContextPtr, (void(*)())(func), sizeof...(Tn), an...); // Cria o novo contexto.
             };
 
             ~Context();

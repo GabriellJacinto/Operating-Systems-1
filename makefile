@@ -13,7 +13,7 @@ H_SOURCE=$(wildcard ./source/*.h)
 OBJ=$(subst .cc,.o,$(subst source,objects,$(CC_SOURCE)))
 
 # Compiler and linker
-CC=gcc
+CC=g++
 
 # Flags for compiler
 CC_FLAGS=-c         \
