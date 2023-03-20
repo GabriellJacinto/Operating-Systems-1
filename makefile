@@ -4,7 +4,7 @@
 PROJ_NAME=project_SOI
 
 # .c files
-C_SOURCE=$(wildcard ./source/*.cc)
+CC_SOURCE=$(wildcard ./source/*.cc)
 
 # .h files
 H_SOURCE=$(wildcard ./source/*.h)
@@ -36,12 +36,12 @@ $(PROJ_NAME): $(OBJ)
 	@ echo 'Finished building binary: $@'
 	@ echo ' '
 
-./objects/%.o: ./source/%.c ./source/%.h
+./objects/%.o: ./source/%.cc ./source/%.h
 	@ echo 'Building target using GCC compiler: $<'
 	$(CC) $< $(CC_FLAGS) -o $@
 	@ echo ' '
 
-./objects/main.o: ./source/main.c $(H_SOURCE)
+./objects/main.o: ./source/main.cc $(H_SOURCE)
 	@ echo 'Building target using GCC compiler: $<'
 	$(CC) $< $(CC_FLAGS) -o $@
 	@ echo ' '
