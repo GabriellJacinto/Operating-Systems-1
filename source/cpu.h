@@ -22,6 +22,7 @@ class CPU
             Context(void (* func)(Tn ...), Tn ... an) {
                 allocateStack(); // aloca espaço para a pilha do contexto.
                 save(); // inicializa o contexto em _context. Que será usado no makecontext.
+
                 this->_context.uc_link = 0; // ponteiro ao contexto que seria carregado após o retorno do contexto atual. 
                                             // porém, como não haverá tal retorno, esse valor é 0.
                 setContextStack(); 

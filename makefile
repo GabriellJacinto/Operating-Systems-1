@@ -1,7 +1,7 @@
 # My third makefile
 
 # Name of the project
-PROJ_NAME=project_SOI
+PROJ_NAME=main
 
 # .c files
 CC_SOURCE=$(wildcard ./source/*.cc)
