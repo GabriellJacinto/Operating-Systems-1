@@ -5,13 +5,13 @@ __BEGIN_API
 
 void CPU::Context::save()
 {
-    ucontext_t * contextToSavePtr = &this->_context;
+    ucontext_t *contextToSavePtr = &this->_context;
     getcontext(contextToSavePtr);
 }
 
 void CPU::Context::load()
 {
-    ucontext_t * contextToLoadPtr = &this->_context;
+    ucontext_t *contextToLoadPtr = &this->_context;
     setcontext(contextToLoadPtr);
 
 }
@@ -27,8 +27,8 @@ CPU::Context::~Context()
 
 int CPU::switch_context(Context *from, Context *to)
 {
-    ucontext_t * currentContextPtr = &from->_context;
-    ucontext_t * nextContextPtr = &to->_context;
+    ucontext_t *currentContextPtr = &from->_context;
+    ucontext_t *nextContextPtr = &to->_context;
     int swapWorked = swapcontext(currentContextPtr, nextContextPtr);
 }
 
