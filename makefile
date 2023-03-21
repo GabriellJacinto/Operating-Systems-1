@@ -21,8 +21,8 @@ CC_FLAGS=-c         \
          -Wall      \
          -ansi      \
          -pedantic  \
-		 -g         # opcao de debug
-
+		 -g         \
+         -std=c++11
 # Command used at clean target
 RM = rm -rf
 

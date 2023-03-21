@@ -26,10 +26,15 @@ CPU::Context::~Context()
 }
 
 int CPU::switch_context(Context *from, Context *to)
-{
-    ucontext_t *currentContextPtr = &from->_context;
-    ucontext_t *nextContextPtr = &to->_context;
-    int swapWorked = swapcontext(currentContextPtr, nextContextPtr);
+{   
+    if (from &&to ){
+        ucontext_t *currentContextPtr = &from->_context;
+        ucontext_t *nextContextPtr = &to->_context;
+        int swapWorked = swapcontext(currentContextPtr, nextContextPtr);
+        return swapWorked;
+    } else {
+        return -1;
+    }
 }
 
 __END_API
