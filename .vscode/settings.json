@@ -1,9 +1,0 @@
-{
-    "files.associations": {
-        "iostream": "cpp",
-        "atomic": "cpp",
-        "stdexcept": "cpp",
-        "memory_resource": "cpp"
-    },
-    "C_Cpp.errorSquiggles": "enabled"
-}
