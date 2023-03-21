@@ -20,7 +20,8 @@ CC_FLAGS=-c         \
          -W         \
          -Wall      \
          -ansi      \
-         -pedantic
+         -pedantic  \
+		 -g         # opcao de debug
 
 # Command used at clean target
 RM = rm -rf
