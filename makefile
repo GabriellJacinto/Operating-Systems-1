@@ -7,7 +7,7 @@ PROJ_NAME=main
 CC_SOURCE=$(wildcard ./source/*.cc)
 
 # .h files
-H_SOURCE=$(wildcard ./source/*.h)
+H_SOURCE=$(wildcard ./headers/*.h)
 
 # Object files
 OBJ=$(subst .cc,.o,$(subst source,objects,$(CC_SOURCE)))
@@ -22,6 +22,7 @@ CC_FLAGS=-c         \
          -ansi      \
          -pedantic  \
 		 -g         \
+		 -l         \
          -std=c++11
 # Command used at clean target
 RM = rm -rf
@@ -37,7 +38,7 @@ $(PROJ_NAME): $(OBJ)
 	@ echo 'Finished building binary: $@'
 	@ echo ' '
 
-./objects/%.o: ./source/%.cc ./source/%.h
+./objects/%.o: ./source/%.cc ./headers/%.h
 	@ echo 'Building target using GCC compiler: $<'
 	$(CC) $< $(CC_FLAGS) -o $@
 	@ echo ' '

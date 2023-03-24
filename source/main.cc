@@ -1,6 +1,6 @@
-#include "cpu.h"
+#include "../headers/cpu.h"
 #include <iostream>
-#include "main_class.h"
+#include "../headers/main_class.h"
 
 __USING_API 
 
