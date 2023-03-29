@@ -1,9 +1,9 @@
 #ifndef thread_h
 #define thread_h
 
-#include "cpu.h"
-#include "traits.h"
-#include "debug.h"
+#include "../headers/cpu.h"
+#include "../headers/traits.h"
+#include "../headers/debug.h"
 
 __BEGIN_API
 
@@ -50,6 +50,18 @@ public:
     /*
      * Qualquer outro método que você achar necessário para a solução.
      */ 
+    Context * context() {return _context;} // retorna o contexto da thread, que é um atributo privado.
+
+    
+
+    static unsigned int get_available_id()
+    {
+        if (!Thread::available_id)
+            Thread::available_id = 1;
+        else
+            Thread::available_id++;
+        return Thread::available_id++;
+    } // retorna o id da thread, que é um atributo privado.
 
 private:
     int _id;
@@ -59,7 +71,19 @@ private:
     /*
      * Qualquer outro atributo que você achar necessário para a solução.
      */ 
+    static Thread * _main; // thread principal do programa.
+    static unsigned int available_id; // id disponível para a próxima thread a ser criada. Unsigned int porque é sempre positivo.
 };
+
+template <typename ... Tn> 
+Thread::Thread(void (* entry)(Tn ...), Tn ... an) 
+{
+    this->id = get_available_id();
+    this->_context = new Context(entry, an...);
+
+    if (!Thread::_main)
+        Thread::_main = this; // se a thread principal não foi criada, então a thread que está sendo criada é a principal.
+}
 
 __END_API
 
