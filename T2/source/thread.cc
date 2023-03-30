@@ -5,20 +5,20 @@
 
 __BEGIN_API
 
-unsigned int Thread::_available_id = 0;
+int Thread::_available_id = 0;
 
 Thread * Thread::_running;
 
 Thread * Thread::_main;
 
-queue<unsigned int> Thread::_released_ids;
+queue<int> Thread::_released_ids;
 
 int Thread::id()
 {
     return this->_id;
 }
 
-unsigned int Thread::get_available_id()
+int Thread::get_available_id()
 {
     if (Thread::_released_ids.empty())
         Thread::_available_id++;

@@ -54,7 +54,7 @@ public:
      */ 
     Context * context() {return _context;} // retorna o contexto da thread, que é um atributo privado.
 
-    static unsigned int get_available_id(); // retorna o id disponível para a próxima thread a ser criada.
+    static int get_available_id(); // retorna o id disponível para a próxima thread a ser criada.
 
 private:
     int _id;
@@ -65,8 +65,8 @@ private:
      * Qualquer outro atributo que você achar necessário para a solução.
      */ 
     static Thread * _main; // thread principal do programa.
-    static unsigned int _available_id; // id disponível para a próxima thread a ser criada. Unsigned int porque é sempre positivo.
-    static queue<unsigned int> _released_ids; // fila de ids que foram liberados, mas ainda não foram reutilizados.
+    static int _available_id; // id disponível para a próxima thread a ser criada. Unsigned int porque é sempre positivo.
+    static queue<int> _released_ids; // fila de ids que foram liberados, mas ainda não foram reutilizados.
 };
 
 template <typename ... Tn> 
