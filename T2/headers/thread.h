@@ -78,7 +78,7 @@ private:
 template <typename ... Tn> 
 Thread::Thread(void (* entry)(Tn ...), Tn ... an) 
 {
-    this->id = get_available_id();
+    this->_id = get_available_id();
     this->_context = new Context(entry, an...);
 
     if (!Thread::_main)
