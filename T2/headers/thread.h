@@ -4,6 +4,8 @@
 #include "../headers/cpu.h"
 #include "../headers/traits.h"
 #include "../headers/debug.h"
+#include <queue>
+using namespace std;
 
 __BEGIN_API
 
@@ -52,16 +54,7 @@ public:
      */ 
     Context * context() {return _context;} // retorna o contexto da thread, que é um atributo privado.
 
-    
-
-    static unsigned int get_available_id()
-    {
-        if (!Thread::available_id)
-            Thread::available_id = 1;
-        else
-            Thread::available_id++;
-        return Thread::available_id++;
-    } // retorna o id da thread, que é um atributo privado.
+    static unsigned int get_available_id(); // retorna o id disponível para a próxima thread a ser criada.
 
 private:
     int _id;
@@ -72,7 +65,8 @@ private:
      * Qualquer outro atributo que você achar necessário para a solução.
      */ 
     static Thread * _main; // thread principal do programa.
-    static unsigned int available_id; // id disponível para a próxima thread a ser criada. Unsigned int porque é sempre positivo.
+    static unsigned int _available_id; // id disponível para a próxima thread a ser criada. Unsigned int porque é sempre positivo.
+    static queue<unsigned int> _released_ids; // fila de ids que foram liberados, mas ainda não foram reutilizados.
 };
 
 template <typename ... Tn> 

@@ -1,13 +1,35 @@
 #include <iostream>
 #include <ucontext.h>
 #include "../headers/thread.h"
+#include <queue>
 
 __BEGIN_API
 
-int Thread::id() 
+unsigned int Thread::_available_id = 0;
+
+Thread * Thread::_running;
+
+Thread * Thread::_main;
+
+queue<unsigned int> Thread::_released_ids;
+
+int Thread::id()
 {
     return this->_id;
 }
+
+unsigned int Thread::get_available_id()
+{
+    if (Thread::_released_ids.empty())
+        Thread::_available_id++;
+    else
+    {
+        Thread::_available_id = Thread::_released_ids.front();
+        Thread::_released_ids.pop();
+    }
+
+    return Thread::_available_id;
+} // retorna o id da thread, que é um atributo privado.
 
 int Thread::switch_context(Thread * prev, Thread * next) 
 {
@@ -23,6 +45,7 @@ int Thread::switch_context(Thread * prev, Thread * next)
 
 void Thread::thread_exit(int exit_code)
 {
+    Thread::_released_ids.push(this->_id); // Coloca o id da thread que está sendo encerrada na fila de ids liberados.
     if (this->_context)
     {
         delete this->_context;
