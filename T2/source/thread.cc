@@ -5,7 +5,8 @@
 
 __BEGIN_API
 
-int Thread::_available_id = 0;
+int Thread::_available_id = -1; // Se o valor for -1, significa que ainda não foi criada nenhuma thread.
+                                // Primeira thread criada terá id 0.
 
 Thread * Thread::_running;
 
