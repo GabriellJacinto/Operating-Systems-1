@@ -9,17 +9,41 @@
 
 __BEGIN_API
 
-class CPU; //declaração das classes criadas nos trabalhos devem ser colocadas aqui
+// Declaracoes das classes criadas nos trabalhos devem ser colocadas aqui:
+class CPU;
+class Debug;
+class Thread;
+class System;
+class Main;
 
-//declaração da classe Traits
-template<typename T>
-struct Traits {
+// Declaracao da classe Traits
+template<typename T> struct Traits {
+    static const bool debugged = false;
 };
 
-template<> struct Traits<CPU>
-{
-    //Adicionar aqui a declaração do tamanho da Pilha
+template<> struct Traits<CPU> {
     static const int STACK_SIZE = 16000;
+    static const bool debugged = false;
+};
+
+template <> struct Traits<Debug> : public Traits<void> {
+    // Para habilitar um tipo de debug, basta setar sua variavel para true: (ATUALMENTE ESTA O DEFAULT DO PDF)
+    static const bool error = false;
+    static const bool warning = false;
+    static const bool info = false;
+    static const bool trace = true;
+};
+
+template <> struct Traits<Thread> : public Traits<void> {
+    static const bool debugged = false;
+};
+
+template <> struct Traits<System> : public Traits<void> {
+    static const bool debugged = false;
+};
+
+template <> struct Traits<Main> : public Traits<void> {
+    static const bool debugged = false;
 };
 
 __END_API
