@@ -5,6 +5,7 @@
 #include "cpu.h"
 #include "traits.h"
 #include "thread.h"
+#include "system.h"
 
 __BEGIN_API
 
