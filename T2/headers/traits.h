@@ -30,20 +30,20 @@ template <> struct Traits<Debug> : public Traits<void> {
     // Para habilitar um tipo de debug, basta setar sua variavel para true: (ATUALMENTE ESTA O DEFAULT DO PDF)
     static const bool error = false;
     static const bool warning = false;
-    static const bool info = false;
-    static const bool trace = true;
+    static const bool info = true;
+    static const bool trace = false;
 };
 
 template <> struct Traits<Thread> : public Traits<void> {
-    static const bool debugged = false;
+    static const bool debugged = true;
 };
 
 template <> struct Traits<System> : public Traits<void> {
-    static const bool debugged = false;
+    static const bool debugged = true;
 };
 
 template <> struct Traits<Main> : public Traits<void> {
-    static const bool debugged = false;
+    static const bool debugged = true;
 };
 
 __END_API
