@@ -1,6 +1,6 @@
 #include <iostream>
 #include <ucontext.h>
-#include "../headers/thread.h"
+#include "thread.h"
 #include <queue>
 
 __BEGIN_API

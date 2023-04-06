@@ -1,4 +1,4 @@
-#include "../headers/debug.h"
+#include "debug.h"
 
 __BEGIN_API
 

@@ -22,7 +22,7 @@ CC_FLAGS=-c         \
          -ansi      \
          -pedantic  \
 		 -g         \
-		 -l         \
+		 -I ./headers \
          -std=c++11
 # Command used at clean target
 RM = rm -rf
