@@ -46,7 +46,6 @@ int Thread::switch_context(Thread * prev, Thread * next)
 
 void Thread::thread_exit(int exit_code)
 {
-    // db<Thread>(INF) << "\nTHREAD " << this->_id << " DELETADA.\n";
     Thread::_released_ids.push(this->_id); // Coloca o id da thread que está sendo encerrada na fila de ids liberados.
     if (this->_context)
     {

@@ -1,9 +1,9 @@
 #ifndef thread_h
 #define thread_h
 
-#include "cpu.h"
-#include "traits.h"
-#include "debug.h"
+#include "../headers/cpu.h"
+#include "../headers/traits.h"
+#include "../headers/debug.h"
 #include <queue>
 using namespace std;
 
@@ -74,8 +74,6 @@ Thread::Thread(void (* entry)(Tn ...), Tn ... an)
 {
     this->_id = get_available_id();
     this->_context = new Context(entry, an...);
-
-    // db<Thread>(INF) << "\nTHREAD " << this->_id << " CRIADA.\n";
 
     if (!Thread::_main)
         Thread::_main = this; // se a thread principal não foi criada, então a thread que está sendo criada é a principal.

@@ -19,12 +19,10 @@ public:
         ThreadMain = new Thread(run, (char *) main_name.data());
         ping = new Thread(func_ping, (char *) ping_name.data());
         pong = new Thread(func_pong, (char *) pong_name.data());
-     
+        
         mainContext = new CPU::Context();
 
         CPU::switch_context(mainContext, ThreadMain->context());
-
-         // db<Main>(INF) << "\nMAIN DELETADA.\n";
 
         delete mainContext;
     }
