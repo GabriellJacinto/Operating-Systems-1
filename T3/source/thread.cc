@@ -34,6 +34,25 @@ int Thread::get_available_id()
     return Thread::_available_id;
 } // retorna o id da thread, que é um atributo privado.
 
+void Thread::yield()
+{
+// Imprima informação usando o debug em nível TRC;
+
+// Escolha uma próxima thread a ser executada;
+
+// Atualiza a prioridade da tarefa que estava sendo executada (aquela que chamou yield) com o
+// timestamp atual, a fim de reinserí-la na fila de prontos atualizada (cuide de casos especiais, como
+// estado ser FINISHING ou Thread main que não devem ter suas prioridades alteradas);
+
+// Reinsira a thread que estava executando na fila de prontos;
+
+// Atualiza o ponteiro _running;
+
+// Atualiza o estado da próxima thread a ser executada;
+
+// Troque o contexto entre as threads;
+}
+
 int Thread::switch_context(Thread * prev, Thread * next) 
 {
     Thread::_running = next; // Seta a thread em execução como a próxima thread.
