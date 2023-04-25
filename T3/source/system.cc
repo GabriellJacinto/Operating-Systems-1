@@ -6,6 +6,7 @@
 __BEGIN_API
 
 void System::init(){
+    db<System>(INF) << "SYSTEM INICIADO.\n";
     setvbuf(stdout, 0, _IONBF, 0); //setvbuf(FILE *stream, char *buf, int type, size_t size);
 }
 
