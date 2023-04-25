@@ -36,21 +36,31 @@ int Thread::get_available_id()
 
 void Thread::yield()
 {
-// Imprima informação usando o debug em nível TRC;
+    // Imprima informação usando o debug em nível TRC;
+    db<Thread>(TRC) << "Thread::yield(running = " << running() << ")";
 
-// Escolha uma próxima thread a ser executada;
+    // Escolha uma próxima thread a ser executada;
+    Thread * next = Thread::_ready.remove()->object();
+    Thread * prev = Thread::_running;
 
-// Atualiza a prioridade da tarefa que estava sendo executada (aquela que chamou yield) com o
-// timestamp atual, a fim de reinserí-la na fila de prontos atualizada (cuide de casos especiais, como
-// estado ser FINISHING ou Thread main que não devem ter suas prioridades alteradas);
+    // Atualiza a prioridade da tarefa que estava sendo executada (aquela que chamou yield) com o
+    // timestamp atual, a fim de reinserí-la na fila de prontos atualizada (cuide de casos especiais, como
+    // estado ser FINISHING ou Thread main que não devem ter suas prioridades alteradas);
+    if (_running != &_main && _running->_state != FINISHING)
+    {
+        // Reinsira a thread que estava executando na fila de prontos;
+        prev->_state = READY;
+    }
 
-// Reinsira a thread que estava executando na fila de prontos;
+    // Atualiza o ponteiro _running;
+    Thread::_running = next;
 
-// Atualiza o ponteiro _running;
+    // Atualiza o estado da próxima thread a ser executada;
+    next->_state = RUNNING;
 
-// Atualiza o estado da próxima thread a ser executada;
-
-// Troque o contexto entre as threads;
+    // Troque o contexto entre as threads;
+    db<Thread>(TRC) << "\nTHREAD " << prev->_id << " SWITCH TO THREAD " << next->_id << ".\n";
+    switch_context(prev, next);
 }
 
 int Thread::switch_context(Thread * prev, Thread * next) 
