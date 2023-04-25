@@ -100,6 +100,8 @@ public:
 
     static int get_available_id(); // retorna o id disponível para a próxima thread a ser criada.
 
+    static int get_timestamp(); // retorna o timestamp atual.
+
 private:
     int _id;
     Context * volatile _context;

@@ -37,7 +37,7 @@ int Thread::get_available_id()
 void Thread::yield()
 {
     // Imprima informação usando o debug em nível TRC;
-    db<Thread>(TRC) << "Thread::yield(running = " << running() << ")";
+    db<Thread>(TRC) << "Thread::yield(running = " << running() << ")"; // Imprime a thread que está executando.
 
     // Escolha uma próxima thread a ser executada;
     Thread * next = Thread::_ready.remove()->object();
@@ -46,10 +46,13 @@ void Thread::yield()
     // Atualiza a prioridade da tarefa que estava sendo executada (aquela que chamou yield) com o
     // timestamp atual, a fim de reinserí-la na fila de prontos atualizada (cuide de casos especiais, como
     // estado ser FINISHING ou Thread main que não devem ter suas prioridades alteradas);
-    if (_running != &_main && _running->_state != FINISHING)
-    {
+    if (_running != _main && _running->_state != FINISHING)
+    {   
+        _running->_link.rank(get_timestamp()); // Atualiza a prioridade da thread que estava executando.
+
         // Reinsira a thread que estava executando na fila de prontos;
-        prev->_state = READY;
+        _running->_state = READY;
+        _ready.insert(&_running->_link);
     }
 
     // Atualiza o ponteiro _running;
@@ -73,6 +76,12 @@ int Thread::switch_context(Thread * prev, Thread * next)
     int swapWorked = CPU::switch_context(prevThreadContext, nextThreadContext); // Troca o contexto para a thread em execução, que é a próxima.
 
     return swapWorked; // Retorna se a troca de contexto foi bem sucedida.
+}
+
+int Thread::get_timestamp()
+{
+    // Codigo fornecido no enunciado do trabalho.
+    return (chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count());
 }
 
 void Thread::thread_exit(int exit_code)
