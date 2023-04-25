@@ -117,6 +117,7 @@ private:
      */ 
     static Thread * _main; // thread principal do programa.
     static int _available_id; // id disponível para a próxima thread a ser criada. Unsigned int porque é sempre positivo.
+    static int _numOfThreads; // número de threads criadas.
     static queue<int> _released_ids; // fila de ids que foram liberados, mas ainda não foram reutilizados.
 };
 
@@ -124,6 +125,9 @@ template <typename ... Tn>
 inline Thread::Thread(void (* entry)(Tn ...), Tn ... an) 
 {
     this->_id = get_available_id();
+
+    Thread::_numOfThreads++;
+
     this->_context = new Context(entry, an...);
 
     db<Thread>(INF) << "\nTHREAD " << this->_id << " CRIADA.\n";
