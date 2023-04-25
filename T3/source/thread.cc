@@ -49,10 +49,12 @@ void Thread::yield()
     if (_running != _main && _running->_state != FINISHING)
     {   
         _running->_link.rank(get_timestamp()); // Atualiza a prioridade da thread que estava executando.
+        db<Thread>(TRC) << "\nTHREAD " << _running->_id << " UPDATED WITH TIMESTAMP = " << _running->_link.rank() << ".\n";
 
         // Reinsira a thread que estava executando na fila de prontos;
         _running->_state = READY;
         _ready.insert(&_running->_link);
+        db<Thread>(TRC) << "\nTHREAD " << _running->_id << " REINSERTED IN LIST.\n";
     }
 
     // Atualiza o ponteiro _running;
@@ -81,12 +83,13 @@ int Thread::switch_context(Thread * prev, Thread * next)
 int Thread::get_timestamp()
 {
     // Codigo fornecido no enunciado do trabalho.
+    db<Thread>(TRC) << "Thread::get_timestamp() CALLED.\n";
     return (chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count());
 }
 
 void Thread::thread_exit(int exit_code)
 {
-    db<Thread>(INF) << "\nTHREAD " << this->_id << " DELETADA.\n";
+    db<Thread>(INF) << "\nTHREAD " << this->_id << " DELETED.\n";
     Thread::_numOfThreads--;
     Thread::_released_ids.push(this->_id); // Coloca o id da thread que está sendo encerrada na fila de ids liberados.
     if (this->_context)
