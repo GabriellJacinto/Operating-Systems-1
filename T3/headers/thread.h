@@ -98,14 +98,15 @@ public:
      */ 
     Context * context() {return _context;} // retorna o contexto da thread, que é um atributo privado.
 
+    static int rankThreadOnCurrentTime(Thread* newThread); // retorna o tempo atual do sistema.
+
     static int get_available_id(); // retorna o id disponível para a próxima thread a ser criada.
 
 private:
     int _id;
     Context * volatile _context;
     static Thread * _running;
-
-    static Thread _main; 
+    static Thread _main; // thread principal. Não 
     static CPU::Context _main_context;
     static Thread _dispatcher;
     static Ready_Queue _ready;
@@ -115,14 +116,13 @@ private:
     /*
      * Qualquer outro atributo que você achar necessário para a solução.
      */ 
-    static Thread * _main; // thread principal do programa.
     static int _available_id; // id disponível para a próxima thread a ser criada. Unsigned int porque é sempre positivo.
     static int _numOfThreads; // número de threads criadas.
     static queue<int> _released_ids; // fila de ids que foram liberados, mas ainda não foram reutilizados.
 };
 
 template <typename ... Tn> 
-inline Thread::Thread(void (* entry)(Tn ...), Tn ... an) 
+inline Thread::Thread(void (* entry)(Tn ...), Tn ... an : _link(this, Thread::getTimestamp()) 
 {
     this->_id = get_available_id();
 
