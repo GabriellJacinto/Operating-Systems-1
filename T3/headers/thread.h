@@ -98,9 +98,25 @@ public:
      */ 
     Context * context() {return _context;} // retorna o contexto da thread, que é um atributo privado.
 
-    static int rankThreadOnCurrentTime(Thread* newThread); // retorna o tempo atual do sistema.
+    static void rank_thread_on_current_time(Thread* new_thread); // Enfileira a thread na fila de threads prontas, ordenando-as pelo tempo de criação.
 
     static int get_available_id(); // retorna o id disponível para a próxima thread a ser criada.
+
+    static Thread* get_thread_to_dispatch_ready(); // retorna a próxima thread a ser executada.
+
+    static void prepare_dispatcher_to_run_again(); // prepara o dispatcher para ser executado novamente.
+
+    static void check_if_next_thread_is_finished(); // verifica se a próxima thread a ser executada já terminou.
+
+    static void return_to_main(); // retorna para a thread main.
+
+    static void insert_thread_link_on_ready_queue(Thread* thread); // enfileira a thread na fila de threads prontas.
+
+    static void create_main_thread(void (*main)(void *)); // Cria a thread main.
+
+    static void create_dispatcher_thread(); // Cria a thread dispatcher.
+
+    static int get_now_timestamp(); // retorna o tempo atual.
 
 private:
     int _id;
@@ -111,7 +127,8 @@ private:
     static Thread _dispatcher;
     static Ready_Queue _ready;
     Ready_Queue::Element _link;
-    volatile State _state;
+    volatile State _state; // Como o estado da thread pode ser alterado por outra thread, é necessário que ele seja volátil.
+                           // Volatile garante que o compilador não otimize o código para esse estado.
 
     /*
      * Qualquer outro atributo que você achar necessário para a solução.
@@ -122,7 +139,7 @@ private:
 };
 
 template <typename ... Tn> 
-inline Thread::Thread(void (* entry)(Tn ...), Tn ... an : _link(this, Thread::getTimestamp()) 
+inline Thread::Thread(void (*entry)(Tn...), Tn... an) : _link(this, Thread::get_now_timestamp())
 {
     this->_id = get_available_id();
 
@@ -130,10 +147,11 @@ inline Thread::Thread(void (* entry)(Tn ...), Tn ... an : _link(this, Thread::ge
 
     this->_context = new Context(entry, an...);
 
-    db<Thread>(INF) << "\nTHREAD " << this->_id << " CRIADA.\n";
+    insert_thread_link_on_ready_queue(this);
 
-    if (!Thread::_main)
-        Thread::_main = this; // se a thread principal não foi criada, então a thread que está sendo criada é a principal.
+    db<Thread>(TRC) << "THREAD " << this->_id << " CRIADA.\n";
+    db<Thread>(TRC) << Thread::_numOfThreads << " THREADS EXISTENTES.\n";
+    db<Thread>(TRC) << "THREADS PRONTAS: " << _ready.size() << "\n";
 }
 
 __END_API
