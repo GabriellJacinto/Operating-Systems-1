@@ -136,7 +136,6 @@ void Thread::check_if_next_thread_is_finished()
 void Thread::return_to_main()
 {
     db<Thread>(TRC) << "THREAD MAIN EM EXECUÇÃO" << "\n";
-    cout << "THREAD MAIN EM EXECUÇÃO" << "\n";
     _dispatcher._state = FINISHING;
     switch_context(&_dispatcher, &_main);
 }
@@ -144,7 +143,7 @@ void Thread::return_to_main()
 void Thread::yield()
 {
     // Imprima informação usando o debug em nível TRC;
-    db<Thread>(TRC) << "Thread::yield(running = " << ")"; // Imprime a thread que está executando.
+    db<Thread>(TRC) << "Yield Chamado"; // Imprime a thread que está executando.
 
     // Escolha uma próxima thread a ser executada;
     // Como o Dispacher não chama o yield, ele não é rankeado novamente, então sua prioridade sempre será a maior.
@@ -158,12 +157,12 @@ void Thread::yield()
     if (_running != &_main && _running->_state != FINISHING)
     {   
         _running->_link.rank(get_now_timestamp()); // Atualiza a prioridade da thread que estava executando.
-        db<Thread>(TRC) << "\nTHREAD " << _running->_id << " UPDATED WITH TIMESTAMP = " << _running->_link.rank() << ".\n";
+        db<Thread>(TRC) << "\nTHREAD " << _running->_id << " RANKEADA COM NOW TIMESTAMP = " << _running->_link.rank() << ".\n";
 
         // Reinsira a thread que estava executando na fila de prontos;
         _running->_state = READY;
         _ready.insert(&_running->_link);
-        db<Thread>(TRC) << "\nTHREAD " << _running->_id << " REINSERTED IN LIST.\n";
+        db<Thread>(TRC) << "\nTHREAD " << _running->_id << " REINSERIDA NA FILA DE PRONTAS.\n";
     }
 
     // Atualiza o ponteiro _running;
@@ -173,7 +172,7 @@ void Thread::yield()
     next->_state = RUNNING;
 
     // Troque o contexto entre as threads;
-    db<Thread>(TRC) << "\nTHREAD " << prev->_id << " SWITCH TO THREAD " << next->_id << ".\n";
+    db<Thread>(TRC) << "\nTHREAD " << prev->_id << " TEVE SEU CONTEXTO TROCADO PARA " << next->_id << ".\n";
     switch_context(prev, next);
 }
 
