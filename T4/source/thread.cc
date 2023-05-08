@@ -195,6 +195,16 @@ void Thread::insert_thread_link_on_ready_queue(Thread* thread)
     }
 }
 
+void Thread::resume()
+{
+    db<Thread>(TRC) << "Thread::resume() called.";
+    if (_state == SUSPEND)
+    {
+        _state = READY;
+        _ready.insert(&_link);
+    }
+}
+
 Thread::~Thread()
 {
     _ready.remove(&this->_link); // Remove a thread da fila de prontos.

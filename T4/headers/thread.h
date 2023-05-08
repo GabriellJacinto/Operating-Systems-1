@@ -25,6 +25,7 @@ public:
     enum State {
         RUNNING,
         READY,
+        SUSPEND,
         FINISHING
     };
 
