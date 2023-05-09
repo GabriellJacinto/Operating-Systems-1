@@ -12,13 +12,22 @@ using namespace std;
 
 int Thread::_available_id = -1; // Se o valor for -1, significa que ainda não foi criada nenhuma thread.
                                 // Primeira thread criada terá id 0.
+
 int Thread::_numOfThreads = 0;
+
 queue<int> Thread::_released_ids;
+
 Thread *Thread::_running;
+
 Thread Thread::_main;
+
 CPU::Context Thread::_main_context;
+
 Thread Thread::_dispatcher;
+
 Thread::Ready_Queue Thread::_ready;
+
+Thread::Ready_Queue Thread::_suspended;
 
 void Thread::init(void (*main)(void *))
 {
@@ -101,38 +110,6 @@ void Thread::dispatcher()
     return_to_main();
 }
 
-Thread* Thread::get_thread_to_dispatch_ready()
-{
-    {
-        db<Thread>(TRC) << "ESCOLHENDO THREAD A SER DESPACHADA.\n";
-        Thread* next = _ready.remove_head()->object();
-        next->_state = RUNNING;
-        _running = next;
-        
-        return next;
-    }
-}
-
-void Thread::prepare_dispatcher_to_run_again()
-{
-    db<Thread>(TRC) << "PREPARANDO DESPACHANTE PARA EXECUTAR NOVAMENTE.\n";
-    _dispatcher._state = READY;
-    _ready.insert(&Thread::_dispatcher._link);
-}
-
-void Thread::check_if_next_thread_is_finished()
-{
-    db<Thread>(TRC) << "VERIFICANDO SE A PRÓXIMA THREAD A SER EXECUTADA TERMINOU SUA EXECUÇÃO.\n";
-    if (!_ready.empty())
-    {
-        Thread* next = _ready.head()->object();
-        if(next->_state == FINISHING)
-        {
-            _ready.remove_head();
-        }
-    }
-}
-
 void Thread::return_to_main()
 {
     db<Thread>(TRC) << "THREAD MAIN EM EXECUÇÃO" << "\n";
@@ -154,8 +131,8 @@ void Thread::yield()
     // Atualiza a prioridade da tarefa que estava sendo executada (aquela que chamou yield) com o
     // timestamp atual, a fim de reinserí-la na fila de prontos atualizada (cuide de casos especiais, como
     // estado ser FINISHING ou Thread main que não devem ter suas prioridades alteradas);
-    if (_running != &_main && _running->_state != FINISHING)
-    {   
+    if (_running != &_main && _running->_state != FINISHING && _running->_state != SUSPEND)
+    {
         _running->_link.rank(get_now_timestamp()); // Atualiza a prioridade da thread que estava executando.
         db<Thread>(TRC) << "\nTHREAD " << _running->_id << " RANKEADA COM NOW TIMESTAMP = " << _running->_link.rank() << ".\n";
 
@@ -176,17 +153,6 @@ void Thread::yield()
     switch_context(prev, next);
 }
 
-int Thread::switch_context(Thread * prev, Thread * next) 
-{
-    db<Thread>(TRC) << "Thread::switch_context("<<")";
-    Context * prevThreadContext = prev->context();
-    Context * nextThreadContext = next->context();
-
-    int swapWorked = CPU::switch_context(prevThreadContext, nextThreadContext); // Troca o contexto para a thread em execução, que é a próxima.
-
-    return swapWorked; // Retorna se a troca de contexto foi bem sucedida.
-}
-
 void Thread::insert_thread_link_on_ready_queue(Thread* thread)
 {
     if (thread->_id != _main._id)
@@ -195,14 +161,64 @@ void Thread::insert_thread_link_on_ready_queue(Thread* thread)
     }
 }
 
+int Thread::join()
+{
+    // Não permite que a thread espere por si mesma.
+    if (_running == this)
+    {
+        db<Thread>(TRC) << "Thread::join() CHAMADO PELA PRÓPRIA THREAD.\n";
+        return -1;
+    }
+
+    if (this->_state != FINISHING)
+    {
+        _waitingForExit = _running;
+        _running->suspend();
+    }
+
+    return _exit_code;
+}
+
 void Thread::resume()
 {
-    db<Thread>(TRC) << "Thread::resume() called.";
+    db<Thread>(TRC) << "Thread::resume() CHAMADO.";
     if (_state == SUSPEND)
     {
+        _suspended.remove(&_link);
         _state = READY;
         _ready.insert(&_link);
     }
+}
+
+void Thread::suspend()
+{
+    db<Thread>(TRC) << "Thread::suspend() CHAMADO.";
+    // Seta o estado da thread como SUSPEND.
+    _state = SUSPEND;
+
+    // Insere a thread na fila de suspensas. Não remove da fila de prontos, pois o suspend só é chamado quando a thread está executando.
+    _suspended.insert(&_link);
+
+    // Libera a thread do processador. E não a reinsere na fila de prontos.
+    yield();
+}
+
+void Thread::thread_exit(int exit_code)
+{
+    db<Thread>(INF) << "THREAD " << this->_id << " DELETADA.\n";
+    _numOfThreads--; // Decrementa o número de threads criadas.
+    _released_ids.push(this->_id); // Coloca o id da thread que está sendo encerrada na fila de ids liberados.
+    this->_state = FINISHING; // Seta o estado da thread como finalizando.
+    this->_exit_code = exit_code; // Seta o código de término da thread.
+
+    // Se houver uma thread suspensa por estar esperando a execução desta thread terminar, a libera.
+    if (this->_waitingForExit != nullptr)
+    {
+        this->_waitingForExit->resume();
+        this->_waitingForExit = nullptr;
+    }
+    
+    yield(); // Libera o processador para outra thread(DISPACHER).
 }
 
 Thread::~Thread()
@@ -213,15 +229,6 @@ Thread::~Thread()
     {
         delete this->_context;
     }
-}
-
-void Thread::thread_exit(int exit_code)
-{
-    db<Thread>(INF) << "THREAD " << this->_id << " DELETADA.\n";
-    _numOfThreads--; // Decrementa o número de threads criadas.
-    _released_ids.push(this->_id); // Coloca o id da thread que está sendo encerrada na fila de ids liberados.
-    this->_state = FINISHING; // Seta o estado da thread como finalizando.
-    yield(); // Libera o processador para outra thread(DISPACHER).
 }
 
 __END_API

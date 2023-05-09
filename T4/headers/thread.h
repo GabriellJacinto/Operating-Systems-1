@@ -119,6 +119,12 @@ public:
 
     static int get_now_timestamp(); // retorna o tempo atual.
 
+    int join(); // aguarda a thread terminar sua execução.
+
+    void suspend(); // suspende a thread.
+
+    void resume(); // retoma a execução da thread.
+
 private:
     int _id;
     Context * volatile _context;
@@ -127,6 +133,7 @@ private:
     static CPU::Context _main_context;
     static Thread _dispatcher;
     static Ready_Queue _ready;
+    static Ready_Queue _suspended;
     Ready_Queue::Element _link;
     volatile State _state; // Como o estado da thread pode ser alterado por outra thread, é necessário que ele seja volátil.
                            // Volatile garante que o compilador não otimize o código para esse estado.
@@ -137,6 +144,8 @@ private:
     static int _available_id; // id disponível para a próxima thread a ser criada. Unsigned int porque é sempre positivo.
     static int _numOfThreads; // número de threads criadas.
     static queue<int> _released_ids; // fila de ids que foram liberados, mas ainda não foram reutilizados.
+    Thread* _waitingForExit = nullptr; // thread que espera a execução desta thread terminar.
+    int _exit_code; // código de término da thread.
 };
 
 template <typename ... Tn> 
@@ -153,6 +162,56 @@ inline Thread::Thread(void (*entry)(Tn...), Tn... an) : _link(this, Thread::get_
     db<Thread>(TRC) << "THREAD " << this->_id << " CRIADA.\n";
     db<Thread>(TRC) << Thread::_numOfThreads << " THREADS EXISTENTES.\n";
     db<Thread>(TRC) << "THREADS PRONTAS: " << _ready.size() << "\n";
+}
+
+//METODOS ABAIXO USADOS NO DISPATCHER; E COMO SÃO USADOS COM MUITA FREQUÊNCIA, FORAM IMPLEMENTADOS COMO INLINE.
+
+inline Thread* Thread::get_thread_to_dispatch_ready()
+{
+    {
+        db<Thread>(TRC) << "ESCOLHENDO THREAD A SER DESPACHADA.\n";
+        Thread* next = _ready.remove_head()->object();
+        next->_state = RUNNING;
+        _running = next;
+        
+        return next;
+    }
+}
+
+inline void Thread::prepare_dispatcher_to_run_again()
+{
+    db<Thread>(TRC) << "PREPARANDO DESPACHANTE PARA EXECUTAR NOVAMENTE.\n";
+    _dispatcher._state = READY;
+    _ready.insert(&Thread::_dispatcher._link);
+}
+
+inline int Thread::switch_context(Thread * prev, Thread * next) 
+{
+    if (prev == next) // Se a thread que está executando é a mesma que será executada, não há necessidade de trocar o contexto.
+    {
+        return 0;
+    }
+
+    db<Thread>(TRC) << "Thread::switch_context("<<")";
+    Context * prevThreadContext = prev->context();
+    Context * nextThreadContext = next->context();
+
+    int swapWorked = CPU::switch_context(prevThreadContext, nextThreadContext); // Troca o contexto para a thread em execução, que é a próxima.
+
+    return swapWorked; // Retorna se a troca de contexto foi bem sucedida.
+}
+
+inline void Thread::check_if_next_thread_is_finished()
+{
+    db<Thread>(TRC) << "VERIFICANDO SE A PRÓXIMA THREAD A SER EXECUTADA TERMINOU SUA EXECUÇÃO.\n";
+    if (!_ready.empty())
+    {
+        Thread* next = _ready.head()->object();
+        if(next->_state == FINISHING)
+        {
+            _ready.remove_head();
+        }
+    }
 }
 
 __END_API
