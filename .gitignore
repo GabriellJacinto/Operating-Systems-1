@@ -6,3 +6,5 @@ __pycache__/
 tutorial/exemplo-1/exemplo-2.cc
 objects
 main
+CMakeLists.txt
+cmake-build-debug
