@@ -10,3 +10,5 @@ CMakeLists.txt
 cmake-build-debug
 .ideia
 t5/.idea
+/.idea/.gitignore
+/.idea/vcs.xml
