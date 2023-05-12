@@ -9,3 +9,4 @@ main
 CMakeLists.txt
 cmake-build-debug
 .ideia
+t5/.idea
