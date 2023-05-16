@@ -1,8 +1,5 @@
-#include <iostream>
-#include <ucontext.h>
 #include <queue>
 #include <chrono>
-#include <ctime>
 
 #include "thread.h"
 
@@ -26,8 +23,6 @@ CPU::Context Thread::_main_context;
 Thread Thread::_dispatcher;
 
 Thread::Ready_Queue Thread::_ready;
-
-Thread::Ready_Queue Thread::_suspended;
 
 void Thread::init(void (*main)(void *))
 {
@@ -172,7 +167,6 @@ int Thread::join()
 
     if (this->_state != FINISHING)
     {
-        _waitingForExit = _running;
         _running->suspend();
     }
 
@@ -184,7 +178,6 @@ void Thread::resume()
     db<Thread>(TRC) << "Thread::resume() CHAMADO.";
     if (_state == SUSPEND)
     {
-        _suspended.remove(&_link);
         _state = READY;
         _ready.insert(&_link);
     }
@@ -196,8 +189,8 @@ void Thread::suspend()
     // Seta o estado da thread como SUSPEND.
     _state = SUSPEND;
 
-    // Insere a thread na fila de suspensas. Não remove da fila de prontos, pois o suspend só é chamado quando a thread está executando.
-    _suspended.insert(&_link);
+    // Insere a thread na fila de em espera. Não remove da fila de prontos, pois o suspend só é chamado quando a thread está executando.
+    _waiting.insert(&_link);
 
     // Libera a thread do processador. E não a reinsere na fila de prontos.
     yield();
@@ -212,10 +205,10 @@ void Thread::thread_exit(int exit_code)
     this->_exit_code = exit_code; // Seta o código de término da thread.
 
     // Se houver uma thread suspensa por estar esperando a execução desta thread terminar, a libera.
-    if (this->_waitingForExit != nullptr)
+    while(!this->_waiting.empty())
     {
-        this->_waitingForExit->resume();
-        this->_waitingForExit = nullptr;
+        Thread* waitingThread = this->_waiting.remove_head()->object();
+        waitingThread->resume();
     }
     
     yield(); // Libera o processador para outra thread(DISPACHER).

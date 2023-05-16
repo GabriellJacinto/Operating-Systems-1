@@ -99,8 +99,6 @@ public:
      */ 
     Context * context() {return _context;} // retorna o contexto da thread, que é um atributo privado.
 
-    static void rank_thread_on_current_time(Thread* new_thread); // Enfileira a thread na fila de threads prontas, ordenando-as pelo tempo de criação.
-
     static int get_available_id(); // retorna o id disponível para a próxima thread a ser criada.
 
     static Thread* get_thread_to_dispatch_ready(); // retorna a próxima thread a ser executada.
@@ -133,18 +131,17 @@ private:
     static CPU::Context _main_context;
     static Thread _dispatcher;
     static Ready_Queue _ready;
-    static Ready_Queue _suspended;
     Ready_Queue::Element _link;
     volatile State _state; // Como o estado da thread pode ser alterado por outra thread, é necessário que ele seja volátil.
                            // Volatile garante que o compilador não otimize o código para esse estado.
 
     /*
      * Qualquer outro atributo que você achar necessário para a solução.
-     */ 
+     */
     static int _available_id; // id disponível para a próxima thread a ser criada. Unsigned int porque é sempre positivo.
     static int _numOfThreads; // número de threads criadas.
     static queue<int> _released_ids; // fila de ids que foram liberados, mas ainda não foram reutilizados.
-    Thread* _waitingForExit = nullptr; // thread que espera a execução desta thread terminar.
+    Ready_Queue _waiting; // fila de threads que estão aguardando a thread atual terminar sua execução.
     int _exit_code; // código de término da thread.
 };
 
