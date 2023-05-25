@@ -28,6 +28,16 @@ void Semaphore::sleep()
     // mudar seu estado para WAITING (note que WAITING eh diferente de SUSPENDED do trabalho anterior).
 }
 
+int Semaphore::finc(volatile int & number)
+{
+    // O metodo finc() deve incrementar o valor do semaforo de forma atomica.
+}
+
+int Semaphore::fdec(volatile int & number)
+{
+    // O metodo fdec() deve decrementar o valor do semaforo de forma atomica.
+}
+
 void Semaphore::wakeup()
 {
     // O metodo wakeup() deve acordar uma Thread que estava dormindo no semaforo.
