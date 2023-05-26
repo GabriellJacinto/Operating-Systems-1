@@ -139,6 +139,7 @@ private:
     static Thread _dispatcher;
     static Ready_Queue _ready;
     static Ready_Queue _suspended;
+    static Ready_Queue _sleeping;
     Ready_Queue::Element _link;
     volatile State _state; // Como o estado da thread pode ser alterado por outra thread, é necessário que ele seja volátil.
                            // Volatile garante que o compilador não otimize o código para esse estado.

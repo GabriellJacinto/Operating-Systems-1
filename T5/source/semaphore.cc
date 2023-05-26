@@ -17,7 +17,7 @@ void Semaphore::p()
     db<Semaphore>(TRC) << "Semaphore::p called." << "\n";
 
     // PRECISA GARANTIR ATOMICIDADE.
-    if(fdec(value) < 1)
+    if(fdec(number) < 1)
     {
         sleep();
     }
@@ -33,17 +33,11 @@ void Semaphore::v()
     db<Semaphore>(TRC) << "Semaphore::v called" << "\n";
 
     // PRECISA GARANTIR ATOMICIDADE.
-    if(finc(value) < 0)
+    if(finc(number) < 0)
     {
         wakeup();
     }
 
-}
-
-void Semaphore::sleep()
-{
-    // O metodo sleep() deve colocar a Thread que nao conseguir acessar o semaforo para dormir e
-    // mudar seu estado para WAITING (note que WAITING eh diferente de SUSPENDED do trabalho anterior).
 }
 
 int Semaphore::finc(volatile int & number)
@@ -56,19 +50,42 @@ int Semaphore::fdec(volatile int & number)
     // O metodo fdec() deve decrementar o valor do semaforo de forma atomica.
 }
 
+void Semaphore::sleep()
+{
+    // O metodo sleep() deve colocar a Thread que nao conseguir acessar o semaforo para dormir e
+    // mudar seu estado para WAITING (note que WAITING eh diferente de SUSPENDED do trabalho anterior).
+    // A Thread deve ser colocada na fila de dormindo do semaforo.
+    Thread* thread_to_sleep = Thread::_running;
+
+    db<Semaphore>(TRC) << "Semaphore::sleep called to Thread "<< thread_to_sleep->id() << "\n";
+
+    _sleeping.push(thread_to_sleep);
+    thread_to_sleep->sleep();
+}
+
 void Semaphore::wakeup()
 {
     // O metodo wakeup() deve acordar uma Thread que estava dormindo no semaforo.
+    Thread* thread_to_wakeup = _sleeping.front();
+
+    db<Semaphore>(TRC) << "Semaphore::wakeup called to Thread "<< thread_to_wakeup->id() << "\n";
+
+    _sleeping.pop();
+    thread_to_wakeup->wakeup();
 }
 
 void Semaphore::wakeup_all()
 {
     // O metodo wakeup_all() deve acordar todas as Thread que estavam dormindo no semaforo.
+    while (!_sleeping.empty())
+    {
+        wakeup();
+    }
 }
 
 Semaphore::~Semaphore()
 {
-    // IMPLEMENTAR
+    wakeup_all();
 }
 
 __END_API
