@@ -43,11 +43,15 @@ void Semaphore::v()
 int Semaphore::finc(volatile int & number)
 {
     // O metodo finc() deve incrementar o valor do semaforo de forma atomica.
+    // Por ser dependente do processador, finc() deve ser implementada na classe CPU.
+    return CPU::finc();
 }
 
 int Semaphore::fdec(volatile int & number)
 {
     // O metodo fdec() deve decrementar o valor do semaforo de forma atomica.
+    // Por ser dependente do processador, fdec() deve ser implementada na classe CPU.
+    return CPU::fdec();
 }
 
 void Semaphore::sleep()
@@ -59,25 +63,30 @@ void Semaphore::sleep()
 
     db<Semaphore>(TRC) << "Semaphore::sleep called to Thread "<< thread_to_sleep->id() << "\n";
 
-    _sleeping.push(thread_to_sleep);
+    Thread::_sleeping.push(thread_to_sleep);
     thread_to_sleep->sleep();
 }
 
 void Semaphore::wakeup()
 {
     // O metodo wakeup() deve acordar uma Thread que estava dormindo no semaforo.
-    Thread* thread_to_wakeup = _sleeping.front();
+    Thread* thread_to_wakeup = Thread::_sleeping.front();
 
     db<Semaphore>(TRC) << "Semaphore::wakeup called to Thread "<< thread_to_wakeup->id() << "\n";
 
-    _sleeping.pop();
-    thread_to_wakeup->wakeup();
+    if (!Thread::_sleeping.empty())
+    {
+        Thread::_sleeping.pop();
+        thread_to_wakeup->wakeup();
+    }
 }
 
 void Semaphore::wakeup_all()
 {
     // O metodo wakeup_all() deve acordar todas as Thread que estavam dormindo no semaforo.
-    while (!_sleeping.empty())
+    db<Semaphore>(TRC) << "Semaphore::wakeup_all called" << "\n";
+
+    while (!Thread::_sleeping.empty())
     {
         wakeup();
     }

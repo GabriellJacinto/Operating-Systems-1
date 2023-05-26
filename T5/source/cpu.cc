@@ -39,12 +39,18 @@ int CPU::switch_context(Context *from, Context *to)
 
 int CPU::finc(volatile int & number)
 {
-    // IMPLEMENTAR
+    register int result = 1;
+    asm("lock xadd %0, %2" : "=a"(result) : "a"(result), "m"(number));
+    
+    return number;
 }
 
 int CPU::fdec(volatile int & number)
 {
-    // IMPLEMENTAR
+    register int result = -1;
+    asm("lock xadd %0, %2" : "=a"(result) : "a"(result), "m"(number));
+    
+    return number;
 }
 
 __END_API
