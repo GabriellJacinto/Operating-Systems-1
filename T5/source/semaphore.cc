@@ -19,7 +19,7 @@ void Semaphore::p()
     db<Semaphore>(TRC) << "Semaphore::p called." << "\n";
 
     // PRECISA GARANTIR ATOMICIDADE.
-    if(fdec(number) < 1)
+    if(fdec(_value) < 1)
     {
         sleep();
     }
@@ -35,7 +35,7 @@ void Semaphore::v()
     db<Semaphore>(TRC) << "Semaphore::v called" << "\n";
 
     // PRECISA GARANTIR ATOMICIDADE.
-    if(finc(number) < 0)
+    if(finc(_value) < 0)
     {
         wakeup();
     }
@@ -46,14 +46,14 @@ int Semaphore::finc(volatile int & number)
 {
     // O metodo finc() deve incrementar o valor do semaforo de forma atomica.
     // Por ser dependente do processador, finc() deve ser implementada na classe CPU.
-    return CPU::finc();
+    return CPU::finc(number);
 }
 
 int Semaphore::fdec(volatile int & number)
 {
     // O metodo fdec() deve decrementar o valor do semaforo de forma atomica.
     // Por ser dependente do processador, fdec() deve ser implementada na classe CPU.
-    return CPU::fdec();
+    return CPU::fdec(number);
 }
 
 void Semaphore::sleep()
