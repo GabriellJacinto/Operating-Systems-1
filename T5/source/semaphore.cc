@@ -8,6 +8,8 @@ __BEGIN_API
 
 using namespace std;
 
+Semaphore::Asleep_Queue Semaphore::_asleep;
+
 void Semaphore::p()
 {
     // Este método deve implementar a operacao p (ou sleep) de um semaforo. Deve-se decrementar o
@@ -63,20 +65,20 @@ void Semaphore::sleep()
 
     db<Semaphore>(TRC) << "Semaphore::sleep called to Thread "<< thread_to_sleep->id() << "\n";
 
-    Thread::_sleeping.push(thread_to_sleep);
+    _asleep.push(thread_to_sleep);
     thread_to_sleep->sleep();
 }
 
 void Semaphore::wakeup()
 {
     // O metodo wakeup() deve acordar uma Thread que estava dormindo no semaforo.
-    Thread* thread_to_wakeup = Thread::_sleeping.front();
+    Thread* thread_to_wakeup = _asleep.front();
 
     db<Semaphore>(TRC) << "Semaphore::wakeup called to Thread "<< thread_to_wakeup->id() << "\n";
 
-    if (!Thread::_sleeping.empty())
+    if (!_asleep.empty())
     {
-        Thread::_sleeping.pop();
+        _asleep.pop();
         thread_to_wakeup->wakeup();
     }
 }
@@ -86,7 +88,7 @@ void Semaphore::wakeup_all()
     // O metodo wakeup_all() deve acordar todas as Thread que estavam dormindo no semaforo.
     db<Semaphore>(TRC) << "Semaphore::wakeup_all called" << "\n";
 
-    while (!Thread::_sleeping.empty())
+    while (!_asleep.empty())
     {
         wakeup();
     }

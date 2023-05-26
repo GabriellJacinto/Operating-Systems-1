@@ -19,6 +19,10 @@ protected:
     typedef CPU::Context Context;
 
 public:
+
+    // Declaracao de Semaphore como friend class para permitir acessar ao ponteiro _running.
+    friend class Semaphore;
+
     typedef Ordered_List<Thread> Ready_Queue;
 
     // Thread State
@@ -139,7 +143,6 @@ private:
     static Thread _dispatcher;
     static Ready_Queue _ready;
     static Ready_Queue _suspended;
-    static Ready_Queue _sleeping;
     Ready_Queue::Element _link;
     volatile State _state; // Como o estado da thread pode ser alterado por outra thread, é necessário que ele seja volátil.
                            // Volatile garante que o compilador não otimize o código para esse estado.
