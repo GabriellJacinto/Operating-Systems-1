@@ -141,7 +141,8 @@ private:
     static int _available_id; // id disponível para a próxima thread a ser criada. Unsigned int porque é sempre positivo.
     static int _numOfThreads; // número de threads criadas.
     static queue<int> _released_ids; // fila de ids que foram liberados, mas ainda não foram reutilizados.
-    Ready_Queue _waiting; // fila de threads que estão aguardando a thread atual terminar sua execução.
+    Thread* _waiting; // thread que está aguardando a execução desta thread.
+    static Ready_Queue _suspended; // fila de threads suspensas.
     int _exit_code; // código de término da thread.
 };
 

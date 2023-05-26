@@ -24,6 +24,8 @@ Thread Thread::_dispatcher;
 
 Thread::Ready_Queue Thread::_ready;
 
+Thread::Ready_Queue Thread::_suspended;
+
 void Thread::init(void (*main)(void *))
 {
     // Cria a thread main, passando main() e a string "Main" como parâmetros.
@@ -167,6 +169,7 @@ int Thread::join()
 
     if (this->_state != FINISHING)
     {
+        _waiting = _running;
         _running->suspend();
     }
 
@@ -179,6 +182,7 @@ void Thread::resume()
     if (_state == SUSPEND)
     {
         _state = READY;
+        _suspended.remove(&_link);
         _ready.insert(&_link);
     }
 }
@@ -189,11 +193,18 @@ void Thread::suspend()
     // Seta o estado da thread como SUSPEND.
     _state = SUSPEND;
 
-    // Insere a thread na fila de em espera. Não remove da fila de prontos, pois o suspend só é chamado quando a thread está executando.
-    _waiting.insert(&_link);
+    if (_running != this)
+    {
+        _ready.remove(&_link); // Remove a thread da fila de prontos.
+    }
+
+    _suspended.insert(&_link); // Insere a thread na fila de suspensas.
 
     // Libera a thread do processador. E não a reinsere na fila de prontos.
-    yield();
+    if (_running == this)
+    {
+        yield();
+    }
 }
 
 void Thread::thread_exit(int exit_code)
@@ -205,12 +216,11 @@ void Thread::thread_exit(int exit_code)
     this->_exit_code = exit_code; // Seta o código de término da thread.
 
     // Se houver uma thread suspensa por estar esperando a execução desta thread terminar, a libera.
-    while(!this->_waiting.empty())
+    if (_waiting)
     {
-        Thread* waitingThread = this->_waiting.remove_head()->object();
-        waitingThread->resume();
+        _waiting->resume();
     }
-    
+
     yield(); // Libera o processador para outra thread(DISPACHER).
 }
 

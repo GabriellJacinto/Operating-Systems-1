@@ -67,7 +67,6 @@ public:
         ec = ping_pong_threads[4]->join();
         std::cout << "main: Pung acabou com exit code " << ec << "\n";
 
-
         std::cout << (char *) name << ": fim\n";
 
         delete ping_pong_threads[0];
@@ -76,7 +75,6 @@ public:
         delete ping_pong_threads[3];
         delete ping_pong_threads[4];
     }
-
     ~Main() {}
 
 private:
