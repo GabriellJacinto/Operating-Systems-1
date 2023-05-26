@@ -13,6 +13,15 @@ void Semaphore::p()
     // Este método deve implementar a operacao p (ou sleep) de um semaforo. Deve-se decrementar o
     // inteiro do semaforo de forma atomica (utilizando fdec descrita abaixo) e colocar a Thread para
     // dormir caso a mesma nao conseguir acessar o semaforo (ja existir em uso por outra Thread).
+
+    db<Semaphore>(TRC) << "Semaphore::p called." << "\n";
+
+    // PRECISA GARANTIR ATOMICIDADE.
+    if(fdec(value) < 1)
+    {
+        sleep();
+    }
+
 }
 
 void Semaphore::v()
@@ -20,6 +29,15 @@ void Semaphore::v()
     // Este metodo deve implementar a operacao v (ou wakeup) de um semaforo. Deve-se
     // incrementar o inteiro do semaforo de forma atomica (utilizando finc descrita abaixo) e acordar
     // uma Thread que estiver dormindo no semaforo.
+
+    db<Semaphore>(TRC) << "Semaphore::v called" << "\n";
+
+    // PRECISA GARANTIR ATOMICIDADE.
+    if(finc(value) < 0)
+    {
+        wakeup();
+    }
+
 }
 
 void Semaphore::sleep()
