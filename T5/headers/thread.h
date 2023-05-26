@@ -153,7 +153,7 @@ private:
     static int _available_id; // id disponível para a próxima thread a ser criada. Unsigned int porque é sempre positivo.
     static int _numOfThreads; // número de threads criadas.
     static queue<int> _released_ids; // fila de ids que foram liberados, mas ainda não foram reutilizados.
-    Thread* _waitingForExit = nullptr; // thread que espera a execução desta thread terminar.
+    Thread* _waiting; // thread que espera a execução desta thread terminar.
     int _exit_code; // código de término da thread.
 };
 

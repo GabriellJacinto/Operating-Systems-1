@@ -131,7 +131,7 @@ void Thread::yield()
     // Atualiza a prioridade da tarefa que estava sendo executada (aquela que chamou yield) com o
     // timestamp atual, a fim de reinserí-la na fila de prontos atualizada (cuide de casos especiais, como
     // estado ser FINISHING ou Thread main que não devem ter suas prioridades alteradas);
-    if (_running != &_main && _running->_state != FINISHING && _running->_state != SUSPEND)
+    if (_running != &_main && _running->_state != FINISHING && _running->_state != SUSPEND && _running->_state != WAITING)
     {
         _running->_link.rank(get_now_timestamp()); // Atualiza a prioridade da thread que estava executando.
         db<Thread>(TRC) << "\nTHREAD " << _running->_id << " RANKEADA COM NOW TIMESTAMP = " << _running->_link.rank() << ".\n";
@@ -150,6 +150,7 @@ void Thread::yield()
 
     // Troque o contexto entre as threads;
     db<Thread>(TRC) << "\nTHREAD " << prev->_id << " TEVE SEU CONTEXTO TROCADO PARA " << next->_id << ".\n";
+
     switch_context(prev, next);
 }
 
@@ -163,19 +164,23 @@ void Thread::insert_thread_link_on_ready_queue(Thread* thread)
 
 int Thread::join()
 {
-    // Não permite que a thread espere por si mesma.
     if (_running == this)
     {
         db<Thread>(TRC) << "Thread::join() CHAMADO PELA PRÓPRIA THREAD.\n";
         return -1;
     }
 
-    if (this->_state != FINISHING)
+    if (_waiting)
     {
-        _waitingForExit = _running;
-        _running->suspend();
+        db<Thread>(TRC) << "Thread::join() CHAMADO POR UMA THREAD QUE JÁ ESTÁ ESPERANDO.\n";
+        return -1;
     }
 
+    if (this->_state != FINISHING)
+    {
+        _waiting = _running;
+        _running->suspend();
+    }
     return _exit_code;
 }
 
@@ -184,8 +189,8 @@ void Thread::resume()
     db<Thread>(TRC) << "Thread::resume() CHAMADO.";
     if (_state == SUSPEND)
     {
-        _suspended.remove(&_link);
         _state = READY;
+        _suspended.remove(&_link);
         _ready.insert(&_link);
     }
 }
@@ -196,21 +201,39 @@ void Thread::suspend()
     // Seta o estado da thread como SUSPEND.
     _state = SUSPEND;
 
-    // Insere a thread na fila de suspensas. Não remove da fila de prontos, pois o suspend só é chamado quando a thread está executando.
-    _suspended.insert(&_link);
+    _suspended.insert(&_link); // Insere a thread na fila de suspensas.
 
-    // Libera a thread do processador. E não a reinsere na fila de prontos.
-    yield();
+    if (_running != this)
+    {
+        _ready.remove(&_link); // Remove a thread da fila de prontos.
+    }
+    else
+    {
+        yield();
+    }
 }
 
 void Thread::sleep()
 {
-    // IMPLEMENTAR: Coloca a thread em waiting.
+    cout << "Thread::sleep() CHAMADO.\n";
+    _state = WAITING;
+    if (_running != this)
+    {
+        _ready.remove(&_link);
+    }
+    else
+    {
+        yield();
+    }
 }
 
 void Thread::wakeup()
 {
-    // IMPLEMENTAR: Acorda a thread.
+    cout << "Thread::wakeup() CHAMADO.\n";
+    _state = READY;
+    _link.rank(get_now_timestamp());
+    _ready.insert(&_link);
+    yield();
 }
 
 void Thread::thread_exit(int exit_code)
@@ -222,10 +245,9 @@ void Thread::thread_exit(int exit_code)
     this->_exit_code = exit_code; // Seta o código de término da thread.
 
     // Se houver uma thread suspensa por estar esperando a execução desta thread terminar, a libera.
-    if (this->_waitingForExit != nullptr)
+    if (_waiting)
     {
-        this->_waitingForExit->resume();
-        this->_waitingForExit = nullptr;
+        _waiting->resume();
     }
     
     yield(); // Libera o processador para outra thread(DISPACHER).

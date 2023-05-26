@@ -30,7 +30,7 @@ private:
     void wakeup_all();
 
 private:
-    static Asleep_Queue _asleep;
+    Asleep_Queue _asleep;
     volatile int _value;
 };
 
