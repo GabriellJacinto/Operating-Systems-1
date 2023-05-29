@@ -215,7 +215,7 @@ void Thread::suspend()
 
 void Thread::sleep()
 {
-    cout << "Thread::sleep() CHAMADO.\n";
+    db<Thread>(TRC) << "Thread::sleep() CHAMADO.\n";
     _state = WAITING;
     if (_running != this)
     {
@@ -229,7 +229,7 @@ void Thread::sleep()
 
 void Thread::wakeup()
 {
-    cout << "Thread::wakeup() CHAMADO.\n";
+    db<Thread>(TRC) << "Thread::wakeup() CHAMADO.\n";
     _state = READY;
     _link.rank(get_now_timestamp());
     _ready.insert(&_link);

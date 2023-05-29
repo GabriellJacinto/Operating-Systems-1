@@ -59,7 +59,6 @@ void Semaphore::sleep()
     // O metodo sleep() deve colocar a Thread que nao conseguir acessar o semaforo para dormir e
     // mudar seu estado para WAITING (note que WAITING eh diferente de SUSPENDED do trabalho anterior).
     // A Thread deve ser colocada na fila de dormindo do semaforo.
-    cout << "Semaphore::sleep called" << "\n";
 
     db<Semaphore>(TRC) << "Semaphore::sleep called to Thread "<< Thread::_running->id() << "\n";
 
