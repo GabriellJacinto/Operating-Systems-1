@@ -12,3 +12,6 @@ cmake-build-debug
 t5/.idea
 /.idea/.gitignore
 /.idea/vcs.xml
+/FinalProject/cmake_install.cmake
+/FinalProject/CMakeCache.txt
+/FinalProject/CMakeFiles/
