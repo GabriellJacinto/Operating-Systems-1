@@ -1,0 +1,13 @@
+# Makefile Definitions
+
+# Paths
+PROJDIR := $(abspath $(dir $(filter %makedefs, $(MAKEFILE_LIST))))
+TOP := $(PROJDIR)
+HEADERS := $(TOP)/include
+SRC := $(TOP)/src
+OBJDIR := $(TOP)/objects
+
+# Flags
+LIBS = -lsfml-graphics -lsfml-window -lsfml-system -lm -lpng -g
+
+CC_FLAGS := -c -W -Wall -Wextra -ansi -pedantic -g -I$(HEADERS) -std=c++14
