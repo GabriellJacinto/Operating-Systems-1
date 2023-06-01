@@ -1,6 +1,6 @@
 #include "Game/window.h"
 
-int main(void)
+int main()
 {
     Window window;
 
