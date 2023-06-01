@@ -1,6 +1,5 @@
 #include "Game/window.h"
 
-
 Window::Window()
 {
     load_and_bind_textures();

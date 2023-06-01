@@ -5,6 +5,7 @@
 #include <iostream>
 #include "Concurrency/traits.h"
 #include <queue>
+#include <string>
 
 __BEGIN_API
 
@@ -13,22 +14,13 @@ using namespace std;
 class KeyboardHandler
 {
 public:
-    typedef sf::Keyboard Key;
+    typedef sf::Event Event;
 
-    KeyboardHandler();
-    ~KeyboardHandler();
-
-    void init();
-    void start();
-    bool isKeyPressed(Key key);
+    KeyboardHandler() = default;
+    ~KeyboardHandler() = default;
+    static string getPressedKey(Event event);
 
 private:
-    void update();
-
-    float beginTime;
-    float nowTime;
-
-    queue<sf::Event> events;
 
 };
 
