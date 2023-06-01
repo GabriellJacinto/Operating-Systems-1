@@ -4,6 +4,9 @@
 #include <iostream>
 #include <png.h>
 #include <SFML/Graphics.hpp>
+#include "Concurrency/traits.h"
+
+__BEGIN_API
 
 class Window
 {
@@ -36,5 +39,7 @@ private:
     sf::Texture enemy_ship_tex;
     sf::Sprite enemy_ship_sprite;
 };
+
+__END_API
 
 #endif

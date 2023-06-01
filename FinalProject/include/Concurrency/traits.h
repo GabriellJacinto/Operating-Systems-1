@@ -18,8 +18,9 @@ class Main;
 class Lists;
 class Semaphore;
 class KeyboardHandler;
-class window;
+class Window;
 class fpsController;
+class Controller;
 
 // Declaracao da classe Traits
 template<typename T> struct Traits {
@@ -63,11 +64,15 @@ template <> struct Traits<KeyboardHandler> : public Traits<void> {
     static const bool debugged = false;
 };
 
-template <> struct Traits<window> : public Traits<void> {
+template <> struct Traits<Window> : public Traits<void> {
     static const bool debugged = false;
 };
 
 template <> struct Traits<fpsController> : public Traits<void> {
+    static const bool debugged = false;
+};
+
+template <> struct Traits<Controller> : public Traits<void> {
     static const bool debugged = false;
 };
 

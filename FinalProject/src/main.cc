@@ -1,10 +1,8 @@
-#include "Game/window.h"
+#include "Game/Controller.h"
 
 int main()
 {
-    Window window;
 
-    window.run();
 
     return 0;
 }
