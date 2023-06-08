@@ -1,4 +1,4 @@
-#include "Game/Controller.h"
+#include "Game/Control/BrickShooter.h"
 
 int main()
 {

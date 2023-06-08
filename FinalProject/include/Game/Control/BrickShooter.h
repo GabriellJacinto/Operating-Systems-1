@@ -2,19 +2,26 @@
 #define controller_h
 
 #include "Concurrency/traits.h"
+#include <SFML/Graphics.hpp>
 
 __BEGIN_API
 
-class Controller
+
+class BrickShooter
 {
 public:
-    Controller();
-    ~Controller();
+    typedef sf::Event Event;
 
-    void processUserInput();
+    BrickShooter();
+    ~BrickShooter();
+
+    void processUserInput(Event event);
+
 private:
     // fpsController
     // SpaceShipController
+
+    void update();
 };
 
 __END_API

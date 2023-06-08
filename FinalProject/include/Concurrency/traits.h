@@ -20,7 +20,7 @@ class Semaphore;
 class KeyboardHandler;
 class Window;
 class fpsController;
-class Controller;
+class BrickShooter;
 
 // Declaracao da classe Traits
 template<typename T> struct Traits {
@@ -72,7 +72,7 @@ template <> struct Traits<fpsController> : public Traits<void> {
     static const bool debugged = false;
 };
 
-template <> struct Traits<Controller> : public Traits<void> {
+template <> struct Traits<BrickShooter> : public Traits<void> {
     static const bool debugged = false;
 };
 
