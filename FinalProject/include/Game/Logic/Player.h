@@ -13,6 +13,7 @@
 #include "Game/Logic/Point.h"
 #include <memory>
 #include "Game/Control/Clock.h"
+#include "Game/Logic/Shot.h"
 
 __BEGIN_API
 
@@ -21,46 +22,48 @@ class CollisionHandler;
 class Player : public Collidable
 {
 public:
-    Player();
     Player(KeyboardHandler* keyboardHandler);
-    ~Player();
+    ~Player() override = default;
 
     void run();
-    void draw();
-    void collide(int damage);
-    bool isDead();
-    void update(double diffTime);
-    int getLife();
-    int getSize();
-    Point getPosition();
+    void draw(sf::RenderWindow, double diffTime) override;
+    void collide(int damage) override;
+    bool isDead() override;
+    void update(double diffTime) override;
+    bool isOutOfPlay();
+    int getLife() const;
+    int getSize() override;
+    Point getPosition() override;
 
 private:
-    void init();
     static int HALF_PLAYER_SIZE;
     static int PLAYER_SIZE;
-    static int PLAYER_TRAVEL_SPEED;
-    static int WEAK_ATTACK_DELAY;
-    static int STRONG_ATTACK_DELAY;
-    static Vector PLAYER_PROJECTILE_SPEED;
+    static int PLAYER_SPEED;
+    static float SHOT_COOLDOWN;
+    static Vector SHOT_SPEED;
 
-    std::shared_ptr<Clock> projectileClock;
+    KeyboardHandler* keyboardHandler;
+    std::shared_ptr<Clock> shotClock;
 
     int life = 3;
 
-    bool wasJustHit = false;
-    float invulnerabilityTime = 0.5f; // in seconds
-    static int INVULNERABILITY_TIME;
+    bool invulnerable = false;
+    float invulnerabilityTime; // in seconds
+    static float INVULNERABILITY_TIME;
 
-    void isOutOfBounds();
+    void move(double diffTime);
+    void handleOutOfBounds();
     void removeFromGame();
     void updateSprite();
     void processKeyboardInput();
-    void shoot();
+    void shoot(Shot::Direction direction);
 
     sf::Sprite sprite;
+    sf::Texture texture;
     Vector speed;
-    void loadSprite();
+    void loadAndBindTexture();
     Point position;
+    Shot::Direction direction;
 };
 
 __END_API

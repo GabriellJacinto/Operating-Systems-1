@@ -39,12 +39,25 @@ void KeyboardHandler::run()
 
             window->pause();
         }
+        else
+        {
+            eventQueueSemaphore->p();
+            eventQueue.push(key);
+            eventQueueSemaphore->v();
+        }
 
-        eventQueueSemaphore->p();
-        eventQueue.push(key);
-        eventQueueSemaphore->v();
         Thread::yield();
     }
+}
+
+Play::KeyPress KeyboardHandler::getNextKey()
+{
+    KeyboardHandler::eventQueueSemaphore->p();
+    Play::KeyPress key = eventQueue.front();
+    eventQueue.pop();
+    KeyboardHandler::eventQueueSemaphore->v();
+
+    return key;
 }
 
 sf::Event KeyboardHandler::getNextEvent()

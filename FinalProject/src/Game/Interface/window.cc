@@ -76,6 +76,7 @@ void Window::load_and_bind_textures()
 
 void Window::run()
 {
+    this->clock = sf::Clock();
     while (window->isOpen())
     {
         float currentTime = clock.getElapsedTime().asSeconds();

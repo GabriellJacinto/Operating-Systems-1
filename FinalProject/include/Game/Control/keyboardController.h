@@ -23,13 +23,15 @@ public:
 
     typedef sf::Event Event;
     void run();
-    Play::KeyPress getPressedKey(Event event);
     static Semaphore* eventQueueSemaphore;
-    Event getNextEvent();
+
+    Play::KeyPress getNextKey();
 
 private:
+    Play::KeyPress getPressedKey(Event event);
+    Event getNextEvent();
     Window* window;
-    queue<Play::KeyPress> eventQueue;
+    queue<Play::KeyPress> eventQueue; // volatile because it is accessed by different threads (keyboardHandler and player)
 };
 
 __END_API

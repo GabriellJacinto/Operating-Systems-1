@@ -24,9 +24,9 @@ public:
 
     void drawElements();
 
-    void addElementToDraw(Drawable* element);
+    static void addElementToDraw(Drawable* element);
 
-    void removeElementToDraw(Drawable* element);
+    static void removeElementToDraw(Drawable* element);
 
     static Semaphore* toBeDrawnSemaphore;
     static Semaphore* infoSemaphore;
@@ -49,6 +49,7 @@ private:
     sf::RenderWindow* window;
     static std::list<Drawable*> toBeDrawn;
     bool paused = false;
+    sf::Clock clock;
 
     //send to each class
     // Maze Texture
