@@ -8,7 +8,7 @@ __BEGIN_API
 
 class Point;
 
-class Drawable : public sf::Drawable
+class Drawable
 {
 public:
     virtual ~Drawable() {}

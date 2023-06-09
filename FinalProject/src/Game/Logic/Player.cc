@@ -146,7 +146,10 @@ void Player::shoot(Shot::Direction direction)
 {
     if (this->shotClock->getElapsedTime() > SHOT_COOLDOWN)
     {
-
+        this->shotClock->restart();
+        Point shotPosition = this->position;
+        Shot::Direction shotDirection = direction;
+        Shot* shot = new Shot(shotPosition, SHOT_SPEED, shotDirection, true); // TEST: IS IT WORKING?
     }
 
 }

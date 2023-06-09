@@ -44,7 +44,7 @@ public:
     int getDamage() const { return this->damage; }
 
     void move(double diffTime);
-    Point getPosition() const { return this->position; }
+    Point getPosition() override;
     bool getIsPlayerShot() const { return this->isPlayerShot; }
     void handleOutOfBounds();
     void removeFromGame();

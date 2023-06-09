@@ -51,4 +51,9 @@ void Shot::removeFromGame()
     delete this;
 }
 
+Point Shot::getPosition()
+{
+    return this->position;
+}
+
 __END_API
