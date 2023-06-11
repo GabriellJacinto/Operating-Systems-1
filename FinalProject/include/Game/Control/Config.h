@@ -3,7 +3,7 @@
 
 #include "Concurrency/traits.h"
 #include <iostream>
-#include "Concurrency/semaphore.h.h"
+#include "Concurrency/semaphore.h"
 #include <ucontext.h>
 
 __BEGIN_API
@@ -13,6 +13,7 @@ class Config
 public:
     static Semaphore* finishedSemaphore;
     static Semaphore* pausedSemaphore;
+    static Semaphore* gameOverSemaphore;
     static int windowWidth;
     static int windowHeight;
     static int playableAreaWidth;
@@ -22,7 +23,9 @@ public:
     static int fps;
     static bool finished;
     static bool paused;
+    static bool gameOver;
     static bool bossExists;
+    static void deleteSemaphores();
 };
 
 __END_API

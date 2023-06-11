@@ -84,6 +84,13 @@ void Window::run()
 
         window->clear();
 
+        if (Config::gameOver)
+        {
+            drawGameOver();
+            window->display();
+            continue;
+        }
+
         if (this->paused)
         {
             drawPause();
@@ -106,18 +113,6 @@ void Window::run()
         window->display();
 
         Thread::yield();
-
-//        window.draw(maze_sprite);
-//
-//        space_ship_sprite.setPosition(220, 365);
-//        window.draw(space_ship_sprite);
-//
-//        enemy_ship_sprite.setPosition(245, 150);
-//        window.draw(enemy_ship_sprite);
-//
-//        shot_sprite.setPosition(204, 400);
-//        window.draw(shot_sprite);
-
     }
 }
 

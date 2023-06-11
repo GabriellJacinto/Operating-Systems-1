@@ -36,8 +36,15 @@ void KeyboardHandler::run()
             Config::pausedSemaphore->p();
             Config::paused = !Config::paused;
             Config::pausedSemaphore->v();
-
+            BrickShooter::pause();
             window->pause();
+        }
+        else if (key == Play::KeyPress::RESTART)
+        {
+            Config::gameOverSemaphore->p();
+            Config::gameOver = false;
+            Config::gameOverSemaphore->v();
+            BrickShooter::restart();
         }
         else
         {

@@ -15,6 +15,8 @@ __BEGIN_API
 
 using namespace std;
 
+class BrickShooter;
+
 class KeyboardHandler
 {
 public:

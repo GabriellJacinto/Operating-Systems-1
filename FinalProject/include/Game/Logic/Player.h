@@ -4,7 +4,6 @@
 #include "Concurrency/traits.h"
 #include "Game/Interface/Collidable.h"
 #include "Game/Control/Config.h"
-#include "Game/Control/BrickShooter.h"
 #include "Game/Interface/window.h"
 #include "Game/Control/keyboardController.h"
 #include "CollisionHandler.h"
@@ -19,11 +18,13 @@ __BEGIN_API
 
 class CollisionHandler;
 
+class Enemy;
+
 class Player : public Collidable
 {
 public:
     Player(KeyboardHandler* keyboardHandler);
-    ~Player() override = default;
+    ~Player() override;
 
     void run();
     void draw(sf::RenderWindow, double diffTime) override;
@@ -35,7 +36,12 @@ public:
     int getSize() override;
     Point getPosition() override;
 
+    static Semaphore* lifeSemaphore;
+    static Semaphore* invulnerabilitySemaphore;
+
 private:
+    friend class Enemy;
+
     static int HALF_PLAYER_SIZE;
     static int PLAYER_SIZE;
     static int PLAYER_SPEED;
@@ -43,16 +49,16 @@ private:
     static Vector SHOT_SPEED;
 
     KeyboardHandler* keyboardHandler;
-    std::shared_ptr<Clock> shotClock;
+    std::unique_ptr<Clock> shotClock;
 
     int life = 3;
-
     bool invulnerable = false;
     float invulnerabilityTime; // in seconds
     static float INVULNERABILITY_TIME;
 
     void move(double diffTime);
     void handleOutOfBounds();
+    void insertInGame();
     void removeFromGame();
     void updateSprite();
     void processKeyboardInput();

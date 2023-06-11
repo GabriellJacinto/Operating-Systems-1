@@ -7,6 +7,7 @@
 #include "Concurrency/thread.h"
 #include "Concurrency/traits.h"
 #include "Game/Logic/Player.h"
+#include "Game/Logic/Enemy.h"
 
 __BEGIN_API
 

@@ -6,22 +6,15 @@
 
 __BEGIN_API
 
-
 class BrickShooter
 {
 public:
-    typedef sf::Event Event;
-
     BrickShooter();
     ~BrickShooter();
 
-    void processUserInput(Event event);
 
 private:
-    // fpsController
-    // SpaceShipController
 
-    void update();
 };
 
 __END_API

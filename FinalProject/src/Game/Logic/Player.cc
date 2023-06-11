@@ -12,16 +12,29 @@ int Player::HALF_PLAYER_SIZE = 24;
 int Player::PLAYER_SIZE = 48;
 int Player::PLAYER_SPEED = 250;
 float Player::SHOT_COOLDOWN = 10;
-Vector Player::SHOT_SPEED = Vector(0, -500);
+Vector Player::SHOT_SPEED = Vector(0, 500);
 float Player::INVULNERABILITY_TIME = 1000;
+Semaphore* Player::lifeSemaphore = new Semaphore();
+Semaphore* Player::invulnerabilitySemaphore = new Semaphore();
 
 Player::Player(KeyboardHandler* keyboardHandler)
 {
     this->keyboardHandler = keyboardHandler;
     this->loadAndBindTexture();
-    this->shotClock = std::make_shared<Clock>();
+    this->shotClock = std::make_unique<Clock>();
     this->invulnerabilityTime = INVULNERABILITY_TIME;
     this->direction = Shot::Direction::UP;
+    this->insertInGame();
+}
+
+Player::~Player()
+{
+    delete Player::lifeSemaphore;
+    delete Player::invulnerabilitySemaphore;
+}
+
+void Player::insertInGame()
+{
     Window::toBeDrawnSemaphore->p();
     Window::addElementToDraw(this);
     Window::toBeDrawnSemaphore->v();
@@ -57,12 +70,16 @@ void Player::draw(sf::RenderWindow window, double diffTime)
 void Player::update(double diffTime)
 {
     this->move(diffTime);
+    Player::invulnerabilitySemaphore->p();
     if (this->invulnerable)
     {
+        Player::invulnerabilitySemaphore->v();
         this->invulnerabilityTime -= diffTime;
         if (this->invulnerabilityTime <= 0)
         {
+            Player::invulnerabilitySemaphore->p();
             this->invulnerable = false;
+            Player::invulnerabilitySemaphore->v();
             this->invulnerabilityTime = INVULNERABILITY_TIME;
         }
     }
@@ -98,10 +115,26 @@ void Player::move(double diffTime)
 
 void Player::collide(int damage)
 {
+    Player::invulnerabilitySemaphore->p();
     if (invulnerable)
+    {
+        Player::invulnerabilitySemaphore->v();
         return;
+    }
+    Player::lifeSemaphore->p();
     this->life -= damage;
+    Player::lifeSemaphore->v();
+    Player::invulnerabilitySemaphore->p();
     this->invulnerable = true;
+    Player::invulnerabilitySemaphore->v();
+
+    if (this->isDead())
+    {
+        Config::gameOverSemaphore->p();
+        Config::gameOver = true;
+        Config::gameOverSemaphore->v();
+        this->removeFromGame();
+    }
 }
 
 bool Player::isOutOfPlay()
@@ -151,7 +184,6 @@ void Player::shoot(Shot::Direction direction)
         Shot::Direction shotDirection = direction;
         Shot* shot = new Shot(shotPosition, SHOT_SPEED, shotDirection, true); // TEST: IS IT WORKING?
     }
-
 }
 
 int Player::getSize()
@@ -174,7 +206,6 @@ void Player::removeFromGame()
     Window::toBeDrawnSemaphore->p();
     Window::removeElementToDraw(this);
     Window::toBeDrawnSemaphore->v();
-
     CollisionHandler::shipsSemaphore->p();
     CollisionHandler::removeShip(this);
     CollisionHandler::shipsSemaphore->v();
