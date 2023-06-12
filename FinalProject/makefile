@@ -42,8 +42,6 @@ compileSource:
 	@$(MAKE) -s -C $(SRC) -f $(MAIN_MAKEFILE)
 
 clean:
-	@$(MAKE) -s -C $(SRC)/Concurrency -f $(CONCURRENCY_MAKEFILE) clean
-	@$(MAKE) -s -C $(SRC)/Game -f $(GAME_MAKEFILE) clean
 	@rm -rf $(PROJ_NAME) $(OBJDIR) *~
 
 .PHONY: all clean

@@ -69,16 +69,31 @@ void Vector::reflectX()
 {
     x = -x;
 }
+
 void Vector::Angle(Point end, Point current, double time)
 {
     x = (end.x - current.x) / time;
     y = (end.y - current.y) / time;
 }
+
 void Vector::flip()
 {
     double temp = x;
     x = y;
     y = temp;
+}
+
+int Vector::length()
+{
+    double length = sqrt(x * x + y * y);
+    int lengthInt = (int)length;
+
+    return lengthInt;
+}
+
+Vector Vector::operator/(double scalar)
+{
+    return Vector(x / scalar, y / scalar);
 }
 
 __END_API

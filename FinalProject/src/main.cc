@@ -1,8 +1,10 @@
 #include "Game/Control/BrickShooter.h"
-// DELETE ALL SEMAPHORES
-int main()
+#include "Concurrency/system.h"
+#include "Concurrency/traits.h"
+
+__USING_API
+
+int main(void)
 {
-
-
-    return 0;
+    System::init(&BrickShooter::play);
 }

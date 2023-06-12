@@ -21,9 +21,11 @@ public:
     static int infoAreaWidth;
     static int infoAreaHeight;
     static int fps;
+    static int lives;
     static bool finished;
     static bool paused;
     static bool gameOver;
+    static int enemiesPerLevel;
     static bool bossExists;
     static void deleteSemaphores();
 };

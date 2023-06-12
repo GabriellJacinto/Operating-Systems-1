@@ -11,42 +11,54 @@
 #include "Game/Logic/Shot.h"
 #include "Game/Interface/Collidable.h"
 #include <random>
-#include "Game/Logic/Player.h"
 
 __BEGIN_API
 
-class CollisionHandler;
+class Player;
 
-enum class Algorithm
-{
-    A,
-    B
-};
+class CollisionHandler;
 
 class Enemy : public Collidable
 {
 public:
+    enum Algorithm
+    {
+        A,
+        B
+    };
+
     Enemy(Algorithm algorithm, Player* player);
+
     ~Enemy() override;
 
     void run();
-    void draw(sf::RenderWindow, double diffTime) override;
+    void draw(sf::RenderWindow &window, double diffTime) override;
     void collide(int damage) override;
     bool isDead() override {return _isDead;}
     void update(double diffTime) override;
     bool isOutOfPlay();
     int getSize() override;
     Point getPosition() override;
+    void setInitialPosition(const Point& position);
+    void setPosition(const Point& position);
+    Point getPreviousPosition();
 
     static Semaphore* isDeadSemaphore;
+    static Semaphore* moveSemaphore;
+
+    int damageGiven = 1;
+
+    static void avoidCollision(Enemy* enemy1, Enemy* enemy2);
+
+    static int ENEMY_SPEED;
 
 private:
     static int HALF_ENEMY_SIZE;
     static int ENEMY_SIZE;
-    static int ENEMY_SPEED;
     static float SHOT_COOLDOWN;
     static float RELIVE_TIME;
     static Vector SHOT_SPEED;
+    static int MINIMUM_DISTANCE;
 
     std::unique_ptr<Clock> shotClock;
     std::unique_ptr<Clock> reliveClock;
@@ -55,6 +67,7 @@ private:
     bool _isDead = false;
     float reliveTime = 0;
     Algorithm algorithm;
+    Point previousPosition;
 
     void processDirectionAlgorithm();
     Shot::Direction directionAlgorithmA();
@@ -65,6 +78,7 @@ private:
     void shoot(Shot::Direction direction);
     void insertInGame();
     void removeFromGame();
+
 
     void loadAndBindTexture();
 

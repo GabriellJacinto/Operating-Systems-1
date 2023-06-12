@@ -11,6 +11,8 @@
 
 __BEGIN_API
 
+class BrickShooter;
+
 class Window
 {
 public:
@@ -22,7 +24,7 @@ public:
 
     void pause();
 
-    void drawElements();
+    void drawElements(double d);
 
     static void addElementToDraw(Drawable* element);
 
@@ -36,18 +38,22 @@ public:
         return window;
     }
 
-    ~Window() = default;
+    ~Window();
 
 private:
     void drawInfo();
     void drawPause();
     void drawGameOver();
+    void drawBackground();
 
     float lastTime;
     sf::RenderWindow* window;
     static std::list<Drawable*> toBeDrawn;
     bool paused = false;
     sf::Clock clock;
+    sf::Texture maze_tex;
+    sf::Sprite maze_sprite;
+    sf::Font font;
 };
 
 __END_API

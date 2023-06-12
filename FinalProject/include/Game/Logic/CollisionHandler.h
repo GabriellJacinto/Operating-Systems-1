@@ -1,27 +1,49 @@
 #ifndef COLLISIONHANDLER_H
 #define COLLISIONHANDLER_H
-#include <list>
+#include <vector>
 #include "Game/Interface/Collidable.h"
-#include "Game/Logic/Shot.h"
 #include "Concurrency/semaphore.h"
 #include "Concurrency/thread.h"
 #include "Concurrency/traits.h"
-#include "Game/Logic/Player.h"
-#include "Game/Logic/Enemy.h"
 
 __BEGIN_API
+
+class BrickShooter;
+class Enemy;
+class Shot;
+class Player;
 
 class CollisionHandler
 {
 public:
     CollisionHandler() = default;
-    ~CollisionHandler() = default;
-    static Semaphore* shipsSemaphore;
+    ~CollisionHandler();
+
+    static Semaphore* playerSemaphore;
+    static Semaphore* enemySemaphore;
     static Semaphore* shotsSemaphore;
 
+    void run();
+
+    static void addEnemy(Enemy* enemy);
+    static void addShot(Shot* shot);
+    static void addPlayer(Player* player);
+
+    static void removeEnemy(Enemy* enemy);
+    static void removeShot(Shot* shot);
+    static void removePlayer();
+
 private:
-    list<Collidable*> ships;
-    list<Shot*> shots;
+    static Player* player;
+    static vector<Enemy*> enemies;
+    static vector<Shot*> shots;
+
+    void handleCollisions();
+    void handlePlayerEnemyCollisions();
+    void handleEnemyCollisions();
+    void handleShotCollisions();
+    bool hasCollided(Drawable* drawable1, Drawable* drawable2);
+
 };
 
 __END_API

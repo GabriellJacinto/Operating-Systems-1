@@ -10,4 +10,4 @@ OBJDIR := $(TOP)/objects
 # Flags
 LIBS = -lsfml-graphics -lsfml-window -lsfml-system -lm -lpng -g
 
-CC_FLAGS := -c -W -Wall -Wextra -ansi -pedantic -g -I$(HEADERS) -std=c++14
+CC_FLAGS := -c -w -Wall -Wextra -ansi -pedantic -g -I$(HEADERS) -std=c++14

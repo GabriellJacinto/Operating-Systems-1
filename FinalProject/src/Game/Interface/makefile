@@ -1,5 +1,5 @@
 # Makefile Definitions
-include ../../makedefs
+include ../../../makedefs
 
 # Name of the project
 PROJ_NAME = Main

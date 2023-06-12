@@ -27,7 +27,8 @@ public:
     ~Player() override;
 
     void run();
-    void draw(sf::RenderWindow, double diffTime) override;
+    void setInitialPosition(const Point& position);
+    void draw(sf::RenderWindow &window, double diffTime) override;
     void collide(int damage) override;
     bool isDead() override;
     void update(double diffTime) override;
@@ -35,9 +36,13 @@ public:
     int getLife() const;
     int getSize() override;
     Point getPosition() override;
+    void setPosition(const Point& position);
+    Point getPreviousPosition();
+    void insertInGame();
 
     static Semaphore* lifeSemaphore;
     static Semaphore* invulnerabilitySemaphore;
+    static Semaphore* moveSemaphore;
 
 private:
     friend class Enemy;
@@ -55,10 +60,10 @@ private:
     bool invulnerable = false;
     float invulnerabilityTime; // in seconds
     static float INVULNERABILITY_TIME;
+    Point previousPosition;
 
     void move(double diffTime);
     void handleOutOfBounds();
-    void insertInGame();
     void removeFromGame();
     void updateSprite();
     void processKeyboardInput();

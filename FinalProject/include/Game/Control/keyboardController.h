@@ -21,13 +21,16 @@ class KeyboardHandler
 {
 public:
     KeyboardHandler(Window* window);
-    ~KeyboardHandler() = default;
+    ~KeyboardHandler();
 
     typedef sf::Event Event;
     void run();
     static Semaphore* eventQueueSemaphore;
+    static Semaphore* saveEventsSemaphore;
 
     Play::KeyPress getNextKey();
+
+    bool saveEvents = true;
 
 private:
     Play::KeyPress getPressedKey(Event event);

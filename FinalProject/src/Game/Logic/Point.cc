@@ -26,6 +26,12 @@ Point Point::operator+(Point p)
 {
     return Point(x + p.x, y + p.y);
 }
+
+Vector Point::operator-(Point p)
+{
+    return Vector(x - p.x, y - p.y);
+}
+
 bool Point::operator==(Point p)
 {
     return this->x == p.x && this->y == p.y;
@@ -50,6 +56,11 @@ void Point::rollRandomX()
 void Point::rollRandomY()
 {
     y = rand() % 300 + 100;
+}
+
+Point Point::operator-(Vector v)
+{
+    return Point(x - v.x, y - v.y);
 }
 
 __END_API

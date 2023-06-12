@@ -36,9 +36,11 @@ struct Vector
      *  @return Vector
      */
     Vector operator*(double scalar);
+    Vector operator/(double scalar);
     Vector operator+(Vector v);
     void rollRandom();
     void rollReallyRandom();
+    int length();
 
     // range [-200, 200]
     void rollRandomY();

@@ -1,19 +1,20 @@
 #include "Concurrency/traits.h"
 #include "Game/Logic/Enemy.h"
+#include "Game/Logic/Player.h"
 #include <cstdlib>  // For std::rand and std::srand
 #include <ctime>    // For std::time
 
 __BEGIN_API
 
-//TODO: IMPLEMENT LAST FUNCS AND IMPLEMENT SHOTS BASED ON CLOCK FROM PROCESSALGO
-
 int Enemy::HALF_ENEMY_SIZE = 24;
 int Enemy::ENEMY_SIZE = 48;
-int Enemy::ENEMY_SPEED = 250;
+int Enemy::ENEMY_SPEED = 50;
 float Enemy::SHOT_COOLDOWN = 500;
 float Enemy::RELIVE_TIME = 2000;
 Vector Enemy::SHOT_SPEED = Vector(0, 500);
 Semaphore* Enemy::isDeadSemaphore = new Semaphore();
+Semaphore* Enemy::moveSemaphore = new Semaphore();
+int Enemy::MINIMUM_DISTANCE = 20;
 
 Enemy::Enemy(Algorithm algorithm, Player* player)
 {
@@ -28,6 +29,7 @@ Enemy::Enemy(Algorithm algorithm, Player* player)
 Enemy::~Enemy()
 {
     delete Enemy::isDeadSemaphore;
+    delete Enemy::moveSemaphore;
 }
 
 void Enemy::insertInGame()
@@ -35,9 +37,9 @@ void Enemy::insertInGame()
     Window::toBeDrawnSemaphore->p();
     Window::addElementToDraw(this);
     Window::toBeDrawnSemaphore->v();
-    CollisionHandler::shipsSemaphore->p();
-    CollisionHandler::addShip(this);
-    CollisionHandler::shipsSemaphore->v();
+    CollisionHandler::enemySemaphore->p();
+    CollisionHandler::addEnemy(this);
+    CollisionHandler::enemySemaphore->v();
 }
 
 void Enemy::loadAndBindTexture()
@@ -99,7 +101,7 @@ void Enemy::shoot(Shot::Direction directionToShoot)
     }
 }
 
-void Enemy::draw(sf::RenderWindow window, double diffTime)
+void Enemy::draw(sf::RenderWindow &window, double diffTime)
 {
     window.draw(this->sprite);
     this->update(diffTime);
@@ -118,15 +120,17 @@ void Enemy::collide(int damage)
 void Enemy::update(double diffTime)
 {
     this->move(diffTime);
-
 }
 
 void Enemy::move(double diffTime)
 {
+    Enemy::moveSemaphore->p();
+    this->previousPosition = this->position;
     this->position = this->position + this->speed * diffTime;
     this->updateSprite();
     this->speed = Vector(0, 0);
     this->handleOutOfBounds();
+    Enemy::moveSemaphore->v();
 }
 
 void Enemy::updateSprite()
@@ -213,9 +217,9 @@ void Enemy::removeFromGame()
     Window::toBeDrawnSemaphore->p();
     Window::removeElementToDraw(this);
     Window::toBeDrawnSemaphore->v();
-    CollisionHandler::shipsSemaphore->p();
-    CollisionHandler::removeShip(this);
-    CollisionHandler::shipsSemaphore->v();
+    CollisionHandler::enemySemaphore->p();
+    CollisionHandler::removeEnemy(this);
+    CollisionHandler::enemySemaphore->v();
 }
 
 void Enemy::handleOutOfBounds()
@@ -228,6 +232,57 @@ void Enemy::handleOutOfBounds()
         this->position.y = Config::playableAreaHeight - ENEMY_SIZE;
     else if (this->position.y < ENEMY_SIZE)
         this->position.y = ENEMY_SIZE;
+}
+
+void Enemy::setInitialPosition(const Point& initialPosition)
+{
+    this->position = initialPosition;
+}
+
+Point Enemy::getPreviousPosition()
+{
+    return this->previousPosition;
+}
+
+void Enemy::setPosition(const Point &newPosition)
+{
+    this->position = newPosition;
+}
+
+void Enemy::avoidCollision(Enemy* enemy1, Enemy* enemy2)
+{
+    Vector enemyVector = enemy2->getPosition() - enemy1->getPosition();
+
+    double distance = enemyVector.length();
+
+    if (distance < MINIMUM_DISTANCE)
+    {
+        double desiredDistance = MINIMUM_DISTANCE;
+
+        Vector correctionVector = (enemyVector / distance) * (desiredDistance - distance);
+
+        Enemy::moveSemaphore->p();
+
+        if (correctionVector.x > 0) {
+            enemy1->direction = Shot::Direction::RIGHT;
+            enemy2->direction = Shot::Direction::LEFT;
+        } else if (correctionVector.x < 0) {
+            enemy1->direction = Shot::Direction::LEFT;
+            enemy2->direction = Shot::Direction::RIGHT;
+        } else if (correctionVector.y > 0) {
+            enemy1->direction = Shot::Direction::DOWN;
+            enemy2->direction = Shot::Direction::UP;
+        } else if (correctionVector.y < 0) {
+            enemy1->direction = Shot::Direction::UP;
+            enemy2->direction = Shot::Direction::DOWN;
+        }
+        enemy1->setPosition(enemy1->getPosition() + correctionVector);
+        enemy1->updateSprite();
+        enemy2->setPosition(enemy2->getPosition() - correctionVector);
+        enemy2->updateSprite();
+
+        Enemy::moveSemaphore->v();
+    }
 }
 
 __END_API

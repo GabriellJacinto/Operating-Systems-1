@@ -12,7 +12,7 @@ class Drawable
 {
 public:
     virtual ~Drawable() {}
-    virtual void draw(sf::RenderWindow window, double diffTime) = 0;
+    virtual void draw(sf::RenderWindow &window, double diffTime) = 0;
     virtual void update(double diffTime) = 0;
     virtual int getSize() = 0;
     virtual Point getPosition() = 0;

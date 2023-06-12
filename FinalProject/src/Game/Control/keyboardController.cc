@@ -3,17 +3,24 @@
 #include "Concurrency/traits.h"
 #include "Game/Control/Play.h"
 #include "Game/Control/Config.h"
-
+#include "Game/Control/BrickShooter.h"
 
 using namespace std;
 
 __BEGIN_API
 
 Semaphore* KeyboardHandler::eventQueueSemaphore = new Semaphore();
+Semaphore* KeyboardHandler::saveEventsSemaphore = new Semaphore();
 
-KeyboardHandler::KeyboardHandler(SOLUTION::Window *window)
+KeyboardHandler::KeyboardHandler(Window *window)
 {
     this->window = window;
+}
+
+KeyboardHandler::~KeyboardHandler()
+{
+    delete KeyboardHandler::eventQueueSemaphore;
+    delete KeyboardHandler::saveEventsSemaphore;
 }
 
 void KeyboardHandler::run()
@@ -49,7 +56,14 @@ void KeyboardHandler::run()
         else
         {
             eventQueueSemaphore->p();
-            eventQueue.push(key);
+            saveEventsSemaphore->p();
+
+            if (saveEvents)
+            {
+                eventQueue.push(key);
+            }
+
+            saveEventsSemaphore->v();
             eventQueueSemaphore->v();
         }
 

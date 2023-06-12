@@ -11,11 +11,12 @@ __BEGIN_API
 int Player::HALF_PLAYER_SIZE = 24;
 int Player::PLAYER_SIZE = 48;
 int Player::PLAYER_SPEED = 250;
-float Player::SHOT_COOLDOWN = 10;
+float Player::SHOT_COOLDOWN = 100;
 Vector Player::SHOT_SPEED = Vector(0, 500);
 float Player::INVULNERABILITY_TIME = 1000;
 Semaphore* Player::lifeSemaphore = new Semaphore();
 Semaphore* Player::invulnerabilitySemaphore = new Semaphore();
+Semaphore* Player::moveSemaphore = new Semaphore();
 
 Player::Player(KeyboardHandler* keyboardHandler)
 {
@@ -31,16 +32,18 @@ Player::~Player()
 {
     delete Player::lifeSemaphore;
     delete Player::invulnerabilitySemaphore;
+    delete Player::moveSemaphore;
 }
 
 void Player::insertInGame()
 {
+    this->life = 3;
     Window::toBeDrawnSemaphore->p();
     Window::addElementToDraw(this);
     Window::toBeDrawnSemaphore->v();
-    CollisionHandler::shipsSemaphore->p();
-    CollisionHandler::addShip(this);
-    CollisionHandler::shipsSemaphore->v();
+    CollisionHandler::playerSemaphore->p();
+    CollisionHandler::addPlayer(this);
+    CollisionHandler::playerSemaphore->v();
 }
 
 void Player::loadAndBindTexture()
@@ -61,7 +64,7 @@ void Player::run()
     }
 }
 
-void Player::draw(sf::RenderWindow window, double diffTime)
+void Player::draw(sf::RenderWindow &window, double diffTime)
 {
     window.draw(this->sprite);
     this->update(diffTime);
@@ -107,10 +110,13 @@ void Player::updateSprite()
 
 void Player::move(double diffTime)
 {
+    Player::moveSemaphore->p();
+    this->previousPosition = this->position;
     this->position = this->position + this->speed * diffTime;
     this->updateSprite();
     this->speed = Vector(0, 0);
     this->handleOutOfBounds();
+    Player::moveSemaphore->v();
 }
 
 void Player::collide(int damage)
@@ -124,6 +130,7 @@ void Player::collide(int damage)
     Player::lifeSemaphore->p();
     this->life -= damage;
     Player::lifeSemaphore->v();
+
     Player::invulnerabilitySemaphore->p();
     this->invulnerable = true;
     Player::invulnerabilitySemaphore->v();
@@ -175,13 +182,13 @@ void Player::processKeyboardInput()
     KeyboardHandler::eventQueueSemaphore->v();
 }
 
-void Player::shoot(Shot::Direction direction)
+void Player::shoot(Shot::Direction directionToShoot)
 {
     if (this->shotClock->getElapsedTime() > SHOT_COOLDOWN)
     {
         this->shotClock->restart();
         Point shotPosition = this->position;
-        Shot::Direction shotDirection = direction;
+        Shot::Direction shotDirection = directionToShoot;
         Shot* shot = new Shot(shotPosition, SHOT_SPEED, shotDirection, true); // TEST: IS IT WORKING?
     }
 }
@@ -206,9 +213,10 @@ void Player::removeFromGame()
     Window::toBeDrawnSemaphore->p();
     Window::removeElementToDraw(this);
     Window::toBeDrawnSemaphore->v();
-    CollisionHandler::shipsSemaphore->p();
-    CollisionHandler::removeShip(this);
-    CollisionHandler::shipsSemaphore->v();
+    CollisionHandler::playerSemaphore->p();
+    CollisionHandler::removePlayer();
+    CollisionHandler::playerSemaphore->v();
+    this->keyboardHandler->saveEvents = false;
 }
 
 void Player::handleOutOfBounds()
@@ -221,6 +229,22 @@ void Player::handleOutOfBounds()
         this->position.y = Config::playableAreaHeight - PLAYER_SIZE;
     else if (this->position.y < PLAYER_SIZE)
         this->position.y = PLAYER_SIZE;
+}
+
+void Player::setInitialPosition(const Point& initialPosition)
+{
+    this->position = initialPosition;
+    this->updateSprite();
+}
+
+Point Player::getPreviousPosition()
+{
+    return this->previousPosition;
+}
+
+void Player::setPosition(const Point &newPosition)
+{
+    this->position = newPosition;
 }
 
 __END_API

@@ -1,7 +1,7 @@
 #ifndef PLAY_H
 #define PLAY_H
 
-#include "traits.h"
+#include "Concurrency/traits.h"
 
 __BEGIN_API
 

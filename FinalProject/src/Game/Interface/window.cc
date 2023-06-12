@@ -5,6 +5,8 @@
 #include "Game/Control/Play.h"
 #include "Game/Control/Config.h"
 #include "Concurrency/thread.h"
+#include "Game/Logic/Info.h"
+#include "Game/Control/BrickShooter.h"
 
 __BEGIN_API
 
@@ -14,10 +16,22 @@ Semaphore* Window::infoSemaphore = new Semaphore();
 
 Window::Window()
 {
-    sf::RenderWindow renderWindow(sf::VideoMode(900, 560), "BrickShooters");
+    cout << "Creating window" << endl;
+    maze_tex.loadFromFile("sprites/maze/screen.png");
+    maze_sprite.setTexture(maze_tex);
+    maze_sprite.scale(1.5, 1.5);
+    font.loadFromFile("assets/fonts/arial.ttf");
+    cout << "Window created" << endl;
+    sf::RenderWindow renderWindow(sf::VideoMode(Config::windowWidth, Config::windowHeight), "BrickShooters");
     this->window = &renderWindow;
     window->setKeyRepeatEnabled(true);
     window->setFramerateLimit(Config::fps);
+}
+
+Window::~Window()
+{
+    delete toBeDrawnSemaphore;
+    delete infoSemaphore;
 }
 
 void Window::quit()
@@ -30,14 +44,67 @@ void Window::pause()
     this->paused = !this->paused;
 }
 
-void Window::drawElements()
+void Window::drawElements(double d)
 {
-
+    toBeDrawnSemaphore->p();
+    for (Drawable* element : toBeDrawn)
+    {
+        element->draw(*window, d);
+    }
 }
 
 void Window::drawInfo()
 {
+    Info::Info* info = BrickShooter::info;
+    int score = info->score;
+    int level = info->level;
+    int lives = info->lives;
 
+    sf::Text infoText;
+    infoText.setFont(font);
+    infoText.setCharacterSize(24);
+    infoText.setFillColor(sf::Color::White);
+    infoText.setPosition((float)Config::infoAreaWidth, 500);
+
+    std::string infoString = "Score: " + std::to_string(score) + "\n"
+                             + "Level: " + std::to_string(level) + "\n"
+                             + "Lives: " + std::to_string(lives);
+
+    infoText.setString(infoString);
+
+    // Draw the text on the screen
+    window->draw(infoText);
+}
+
+void Window::drawBackground()
+{
+    window->draw(maze_sprite);
+}
+
+void Window::drawPause()
+{
+    sf::Text pauseText;
+    pauseText.setFont(font);
+    pauseText.setCharacterSize(24);
+    pauseText.setFillColor(sf::Color::White);
+    pauseText.setPosition((float)Config::infoAreaWidth, 100);
+    pauseText.setString("Game Paused");
+
+    // Draw the text on the screen
+    window->draw(pauseText);
+}
+
+void Window::drawGameOver()
+{
+    sf::Text gameOverText;
+    gameOverText.setFont(font);
+    gameOverText.setCharacterSize(24);
+    gameOverText.setFillColor(sf::Color::White);
+    gameOverText.setPosition((float)Config::infoAreaWidth, 100);
+    gameOverText.setString("Game Over");
+
+    // Draw the text on the screen
+    window->draw(gameOverText);
 }
 
 void Window::addElementToDraw(Drawable* element)
@@ -54,26 +121,6 @@ void Window::removeElementToDraw(Drawable* element)
     toBeDrawnSemaphore->v();
 }
 
-void Window::load_and_bind_textures()
-{
-    // Bind map textures
-    maze_tex.loadFromFile("assets/sprites/maze/screen.png");
-    maze_sprite.setTexture(maze_tex);
-    maze_sprite.scale(1.5, 1.5);
-
-    shot_tex.loadFromFile("assets/sprites/space_ships/shot.png");
-    shot_sprite.setTexture(shot_tex);
-    shot_sprite.scale(-0.5, -0.5);
-
-    space_ship_tex.loadFromFile("assets/sprites/space_ships/space_ship1.png");
-    space_ship_sprite.setTexture(space_ship_tex);
-    space_ship_sprite.scale(-0.5, -0.5);
-
-    enemy_ship_tex.loadFromFile("assets/sprites/space_ships/enemy_space_ship1.png");
-    enemy_ship_sprite.setTexture(enemy_ship_tex);
-    enemy_ship_sprite.scale(-0.5, -0.5);
-}
-
 void Window::run()
 {
     this->clock = sf::Clock();
@@ -83,6 +130,7 @@ void Window::run()
         double diffTime = currentTime - this->lastTime;
 
         window->clear();
+        drawBackground();
 
         if (Config::gameOver)
         {
@@ -102,7 +150,7 @@ void Window::run()
         else
         {
             toBeDrawnSemaphore->p();
-            drawElements();
+            drawElements(diffTime);
             toBeDrawnSemaphore->v();
 
             infoSemaphore->p();
