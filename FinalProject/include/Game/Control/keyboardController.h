@@ -10,6 +10,7 @@
 #include "Concurrency/semaphore.h"
 #include "Game/Interface/window.h"
 #include "Concurrency/thread.h"
+#include "Game/Control/Clock.h"
 
 __BEGIN_API
 
@@ -20,6 +21,12 @@ class BrickShooter;
 class KeyboardHandler
 {
 public:
+    struct keys
+    {
+        Play::KeyPress moveKey;
+        Play::KeyPress actionKey;
+    };
+
     KeyboardHandler(Window* window);
     ~KeyboardHandler();
 
@@ -28,15 +35,16 @@ public:
     static Semaphore* eventQueueSemaphore;
     static Semaphore* saveEventsSemaphore;
 
-    Play::KeyPress getNextKey();
+    keys getNextKey();
 
     bool saveEvents = true;
 
 private:
-    Play::KeyPress getPressedKey(Event event);
-    Event getNextEvent();
+    static std::map<sf::Keyboard::Key, bool> keyStates;
+    keys getPressedKey();
     Window* window;
-    queue<Play::KeyPress> eventQueue; // volatile because it is accessed by different threads (keyboardHandler and player)
+    std::queue<keys> eventQueue;
+    Clock actionClock;
 };
 
 __END_API

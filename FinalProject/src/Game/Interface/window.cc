@@ -10,28 +10,27 @@
 
 __BEGIN_API
 
-list<Drawable*> Window::toBeDrawn = list<Drawable*>();
+vector<Drawable*> Window::toBeDrawn = vector<Drawable*>();
 Semaphore* Window::toBeDrawnSemaphore = new Semaphore();
 Semaphore* Window::infoSemaphore = new Semaphore();
 
 Window::Window()
 {
-    cout << "Creating window" << endl;
-    maze_tex.loadFromFile("sprites/maze/screen.png");
+    maze_tex.loadFromFile("assets/sprites/maze/screen.png");
     maze_sprite.setTexture(maze_tex);
     maze_sprite.scale(1.5, 1.5);
     font.loadFromFile("assets/fonts/arial.ttf");
-    cout << "Window created" << endl;
-    sf::RenderWindow renderWindow(sf::VideoMode(Config::windowWidth, Config::windowHeight), "BrickShooters");
-    this->window = &renderWindow;
-    window->setKeyRepeatEnabled(true);
-    window->setFramerateLimit(Config::fps);
 }
 
 Window::~Window()
 {
     delete toBeDrawnSemaphore;
     delete infoSemaphore;
+}
+
+void Window::close()
+{
+    this->closed = true;
 }
 
 void Window::quit()
@@ -46,7 +45,7 @@ void Window::pause()
 
 void Window::drawElements(double d)
 {
-    toBeDrawnSemaphore->p();
+    //toBeDrawnSemaphore->p();
     for (Drawable* element : toBeDrawn)
     {
         element->draw(*window, d);
@@ -64,7 +63,7 @@ void Window::drawInfo()
     infoText.setFont(font);
     infoText.setCharacterSize(24);
     infoText.setFillColor(sf::Color::White);
-    infoText.setPosition((float)Config::infoAreaWidth, 500);
+    infoText.setPosition((float)Config::infoAreaWidth+75, 225);
 
     std::string infoString = "Score: " + std::to_string(score) + "\n"
                              + "Level: " + std::to_string(level) + "\n"
@@ -75,6 +74,7 @@ void Window::drawInfo()
     // Draw the text on the screen
     window->draw(infoText);
 }
+
 
 void Window::drawBackground()
 {
@@ -87,7 +87,7 @@ void Window::drawPause()
     pauseText.setFont(font);
     pauseText.setCharacterSize(24);
     pauseText.setFillColor(sf::Color::White);
-    pauseText.setPosition((float)Config::infoAreaWidth, 100);
+    pauseText.setPosition((float)Config::infoAreaWidth+35, 100);
     pauseText.setString("Game Paused");
 
     // Draw the text on the screen
@@ -100,7 +100,7 @@ void Window::drawGameOver()
     gameOverText.setFont(font);
     gameOverText.setCharacterSize(24);
     gameOverText.setFillColor(sf::Color::White);
-    gameOverText.setPosition((float)Config::infoAreaWidth, 100);
+    gameOverText.setPosition((float)Config::infoAreaWidth+55, 100);
     gameOverText.setString("Game Over");
 
     // Draw the text on the screen
@@ -109,25 +109,31 @@ void Window::drawGameOver()
 
 void Window::addElementToDraw(Drawable* element)
 {
-    toBeDrawnSemaphore->p();
+   // toBeDrawnSemaphore->p();
     toBeDrawn.push_back(element);
-    toBeDrawnSemaphore->v();
+    //toBeDrawnSemaphore->v();
 }
 
-void Window::removeElementToDraw(Drawable* element)
-{
-    toBeDrawnSemaphore->p();
-    toBeDrawn.remove(element);
-    toBeDrawnSemaphore->v();
-}
+    void Window::removeElementToDraw(Drawable* element)
+    {
+        //toBeDrawnSemaphore->p();
+        toBeDrawn.erase(std::remove(toBeDrawn.begin(), toBeDrawn.end(), element), toBeDrawn.end());
+        //toBeDrawnSemaphore->v();
+    }
 
 void Window::run()
 {
+    sf::RenderWindow renderWindow(sf::VideoMode(Config::windowWidth, Config::windowHeight), "BrickShooters");
+    this->window = &renderWindow;
+    window->setKeyRepeatEnabled(true);
+    window->setFramerateLimit(Config::fps);
     this->clock = sf::Clock();
     while (window->isOpen())
     {
+        cout << "Window running" << endl;
         float currentTime = clock.getElapsedTime().asSeconds();
         double diffTime = currentTime - this->lastTime;
+        this->lastTime = currentTime;
 
         window->clear();
         drawBackground();
@@ -135,32 +141,34 @@ void Window::run()
         if (Config::gameOver)
         {
             drawGameOver();
-            window->display();
-            continue;
+            drawInfo();
         }
-
-        if (this->paused)
+        else if (this->paused)
         {
             drawPause();
 
-            infoSemaphore->p();
+            //infoSemaphore->p();
             drawInfo();
-            infoSemaphore->v();
+            //infoSemaphore->v();
         }
         else
         {
-            toBeDrawnSemaphore->p();
+            //toBeDrawnSemaphore->p();
             drawElements(diffTime);
-            toBeDrawnSemaphore->v();
+            //toBeDrawnSemaphore->v();
 
-            infoSemaphore->p();
+            //infoSemaphore->p();
             drawInfo();
-            infoSemaphore->v();
+            //infoSemaphore->v();
         }
-
         window->display();
 
         Thread::yield();
+
+        if (this->closed)
+        {
+            window->close();
+        }
     }
 }
 

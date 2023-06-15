@@ -15,16 +15,20 @@ Thread* BrickShooter::keyboardHandlerThread;
 Thread* BrickShooter::windowThread;
 vector<Thread*> BrickShooter::enemiesThreads;
 Info::Info* BrickShooter::info;
+#include "Game/Logic/Point.h"
 
 void BrickShooter::play(void * name)
 {
+    // Create game objects
     BrickShooter::init();
 
+    // Create threads
     windowThread = new Thread(BrickShooter::windowThreadFunction);
     playerThread = new Thread(BrickShooter::playerThreadFunction);
     keyboardHandlerThread = new Thread(BrickShooter::keyboardHandlerThreadFunction);
     collisionHandlerThread = new Thread(BrickShooter::collisionHandlerThreadFunction);
 
+    // Start threads
     int index = 0;
     for (auto enemy : BrickShooter::enemies)
     {
@@ -32,57 +36,62 @@ void BrickShooter::play(void * name)
         index++;
     }
 
-    windowThread->join();
-    playerThread->join();
-    keyboardHandlerThread->join();
+    // Wait for threads to finish
     collisionHandlerThread->join();
     for (auto enemyThread : enemiesThreads)
     {
         enemyThread->join();
     }
-
-    delete windowThread;
-    delete playerThread;
-    delete keyboardHandlerThread;
+    windowThread->join();
+    playerThread->join();
+    keyboardHandlerThread->join();
+    // Delete game objects and threads
+    delete window;
+    delete player;
+    delete keyboardHandler;
+        delete collisionHandler;
     delete collisionHandlerThread;
+    delete windowThread;
+    delete keyboardHandlerThread;
     for (auto enemyThread : enemiesThreads)
     {
         delete enemyThread;
     }
+    delete playerThread;
+    for (auto enemy : enemies)
+    {
+        delete enemy;
+    }
+    cout << "Game over" << endl;
 }
 
 void BrickShooter::playerThreadFunction()
 {
     player->run();
-    delete player;
     playerThread->thread_exit(0);
 }
 
 void BrickShooter::collisionHandlerThreadFunction()
 {
     collisionHandler->run();
-    delete collisionHandler;
     collisionHandlerThread->thread_exit(0);
 }
 
 void BrickShooter::keyboardHandlerThreadFunction()
 {
     keyboardHandler->run();
-    delete keyboardHandler;
     keyboardHandlerThread->thread_exit(0);
 }
 
 void BrickShooter::enemiesThreadFunction(int index)
 {
     enemies[index]->run();
-    delete enemies[index];
     enemiesThreads[index]->thread_exit(0);
 }
 
 void BrickShooter::windowThreadFunction()
 {
     window->run();
-    delete window;
     windowThread->thread_exit(0);
 }
 
@@ -92,24 +101,20 @@ void BrickShooter::init()
     info->lives = 3;
     info->score = 0;
     info->level = 1;
+    collisionHandler = new CollisionHandler();
     window = new Window();
     keyboardHandler = new KeyboardHandler(window);
     player = new Player(keyboardHandler);
-    player->setInitialPosition(Point(407, 330));
-    collisionHandler = new CollisionHandler();
-    enemies.push_back(new Enemy(Enemy::Algorithm::A, player));
-    enemies[0]->setInitialPosition(Point(0, 0));
-    enemies.push_back(new Enemy(Enemy::Algorithm::B, player));
-    enemies[1]->setInitialPosition(Point(814, 0));
-    enemies.push_back(new Enemy(Enemy::Algorithm::A, player));
-    enemies[2]->setInitialPosition(Point(0, 660));
-    enemies.push_back(new Enemy(Enemy::Algorithm::B, player));
-    enemies[3]->setInitialPosition(Point(814, 660));
+    enemies.push_back(new Enemy(Enemy::Algorithm::A, player, Point(100, 100)));
+    enemies.push_back(new Enemy(Enemy::Algorithm::A, player, Point(100, Config::playableAreaHeight - 100 - 2*Enemy::ENEMY_SIZE)));
+    enemies.push_back(new Enemy(Enemy::Algorithm::B, player, Point(Config::playableAreaWidth - 100 - Enemy::ENEMY_SIZE, 100)));
+    enemies.push_back(new Enemy(Enemy::Algorithm::B, player, Point(Config::playableAreaWidth - 100 - Enemy::ENEMY_SIZE, Config::playableAreaHeight - 100 - 2*Enemy::ENEMY_SIZE)));
 }
 
 bool BrickShooter::shouldLevelUp()
 {
-    return killedEnemies % Config::enemiesPerLevel == 0 && info->level <= 3;
+    killedEnemies++;
+    return killedEnemies == Config::enemiesPerLevel;
 }
 
 void BrickShooter::increaseScore()
@@ -119,32 +124,57 @@ void BrickShooter::increaseScore()
 
 void BrickShooter::increaseLevel(const vector<Enemy*>& enemiesToIncrease)
 {
-    Info::increaseLevel(*info);
-    killedEnemies = 0;
-    for (auto enemy : enemiesToIncrease)
     {
-        Enemy::ENEMY_SPEED += 100;
+        Info::increaseLevel(*info);
+        killedEnemies = 0;
+        for (auto enemy: enemiesToIncrease) {
+            Enemy::ENEMY_SPEED += 25;
+        }
     }
 }
 
 void BrickShooter::restart()
 {
+
     killedEnemies = 0;
 
     info->lives = Config::lives;
     info->score = 0;
     info->level = 1;
 
+    player->removeFromGame();
     player->insertInGame();
 
-    Config::gameOverSemaphore->p();
+    //Config::gameOverSemaphore->p();
     Config::gameOver = false;
-    Config::gameOverSemaphore->v();
+    //Config::gameOverSemaphore->v();
+
+    enemies[0]->setPosition(Point(100, 100));
+    enemies[0]->previousPosition= Point(100, 100);
+    enemies[1]->setPosition(Point(Point(100, Config::playableAreaHeight - 100 - 2*Enemy::ENEMY_SIZE)));
+    enemies[1]->previousPosition= Point(Point(100, Config::playableAreaHeight - 100 - 2*Enemy::ENEMY_SIZE));
+    enemies[2]->setPosition(Point(Config::playableAreaWidth - 100 - Enemy::ENEMY_SIZE, 100));
+    enemies[2]->previousPosition= Point(Config::playableAreaWidth - 100 - Enemy::ENEMY_SIZE, 100);
+    enemies[3]->setPosition(Point(Config::playableAreaWidth - 100 - Enemy::ENEMY_SIZE, Config::playableAreaHeight - 100 - 2*Enemy::ENEMY_SIZE));
+    enemies[3]->previousPosition= Point(Config::playableAreaWidth - 100 - Enemy::ENEMY_SIZE, Config::playableAreaHeight - 100 - 2*Enemy::ENEMY_SIZE);
+
+    for (auto enemy : enemies)
+        enemy->insertInGame();
+
+    cout << "Restarted" << endl;
+    collisionHandler->restart();
+    for (auto enemy : enemies)
+        CollisionHandler::addEnemy(enemy);
+    CollisionHandler::addPlayer(player);
+
+
+    Enemy::ENEMY_SPEED = 100;
+    cout << "Restarted" << endl;
 }
 
 void BrickShooter::pause()
 {
-    Config::pausedSemaphore->p();
+    //Config::pausedSemaphore->p();
 
     Config::paused = !Config::paused;
     if (Config::paused)
@@ -166,7 +196,7 @@ void BrickShooter::pause()
         }
     }
 
-    Config::pausedSemaphore->v();
+    //Config::pausedSemaphore->v();
 }
 
 __END_API

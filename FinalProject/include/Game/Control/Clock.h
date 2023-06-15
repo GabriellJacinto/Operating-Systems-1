@@ -14,12 +14,12 @@ public:
 
     void restart();
 
-    float getElapsedTime();
+    double getElapsedTime();
 
 private:
     sf::Clock clock;
     int fps;
-    float previousTime;
+    double previousTime;
 };
 
 __END_API

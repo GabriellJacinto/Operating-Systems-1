@@ -1,29 +1,49 @@
 #include "Game/Logic/Shot.h"
 #include "Concurrency/traits.h"
 #include "Game/Logic/CollisionHandler.h"
+#include "Game/Logic/Player.h"
 
 __BEGIN_API
 
-Shot::Shot(const Point &position, const Vector &speed, Shot::Direction direction,bool isPlayerShot)
+Shot::Shot(const Point &position, Shot::Direction direction,bool isPlayerShot)
 {
     this->position = position;
-    this->speed = speed;
+    this->speed = getSpeed(direction);
     this->isPlayerShot = isPlayerShot;
     this->direction = direction;
-
-    Window::toBeDrawnSemaphore->p();
+    //Window::toBeDrawnSemaphore->p();
     Window::addElementToDraw(this);
-    Window::toBeDrawnSemaphore->v();
-    CollisionHandler::shotsSemaphore->p();
+    //Window::toBeDrawnSemaphore->v();
+    //CollisionHandler::shotsSemaphore->p();
     CollisionHandler::addShot(this);
-    CollisionHandler::shotsSemaphore->v();
-
+    //CollisionHandler::shotsSemaphore->v();
     loadAndBindTexture();
+}
+
+Vector Shot::getSpeed(Shot::Direction directionOfShot)
+{
+    Vector shotSpeed;
+    switch (directionOfShot)
+    {
+        case Shot::Direction::LEFT:
+            shotSpeed = Vector(-Player::PLAYER_SPEED, 0);
+            break;
+        case Shot::Direction::RIGHT:
+            shotSpeed = Vector(Player::PLAYER_SPEED, 0);
+            break;
+        case Shot::Direction::UP:
+            shotSpeed = Vector(0, -Player::PLAYER_SPEED);
+            break;
+        case Shot::Direction::DOWN:
+            shotSpeed = Vector(0, Player::PLAYER_SPEED);
+            break;
+    }
+    return shotSpeed * this->speedFactor;
 }
 
 void Shot::loadAndBindTexture()
 {
-    texture.loadFromFile("assets/Sprites/space_ships/shot.png");
+    texture.loadFromFile("assets/sprites/space_ships/shot.png");
     sprite.setTexture(texture);
     sprite.scale(-0.5, -0.5);
 }
@@ -32,6 +52,7 @@ void Shot::draw(sf::RenderWindow &window, double diffTime)
 {
     window.draw(this->sprite);
     this->update(diffTime);
+    this->updateSprite();
 }
 
 inline void Shot::update(double diffTime)
@@ -39,9 +60,15 @@ inline void Shot::update(double diffTime)
     this->move(diffTime);
 }
 
+void Shot::updateSprite()
+{
+    this->sprite.setPosition(this->position.x, this->position.y);
+}
+
 inline void Shot::move(double diffTime)
 {
     this->position = this->position + this->speed * diffTime;
+    this->handleOutOfBounds();
 }
 
 int Shot::getSize()
@@ -63,13 +90,12 @@ void Shot::handleOutOfBounds()
 
 void Shot::removeFromGame()
 {
-    Window::toBeDrawnSemaphore->p();
+    //Window::toBeDrawnSemaphore->p();
     Window::removeElementToDraw(this);
-    Window::toBeDrawnSemaphore->v();
-    CollisionHandler::shotsSemaphore->p();
+    //Window::toBeDrawnSemaphore->v();
+    //CollisionHandler::shotsSemaphore->p();
     CollisionHandler::removeShot(this);
-    CollisionHandler::shotsSemaphore->v();
-    delete this;
+    //CollisionHandler::shotsSemaphore->v();
 }
 
 Point Shot::getPosition()

@@ -14,25 +14,55 @@ Semaphore* CollisionHandler::shotsSemaphore = new Semaphore();
 Player* CollisionHandler::player;
 vector<Enemy*> CollisionHandler::enemies;
 vector<Shot*> CollisionHandler::shots;
+vector <Shot*> CollisionHandler::shotsToRemove;
+float CollisionHandler::ENEMY_COLLISION_TIME = 500;
+
+CollisionHandler::CollisionHandler()
+{
+    enemyCollisionClock = make_unique<Clock>();
+}
 
 CollisionHandler::~CollisionHandler()
 {
     delete playerSemaphore;
     delete enemySemaphore;
     delete shotsSemaphore;
+
+    for (auto shot: shots)
+    {
+        delete shot;
+    }
+
+    for (auto shot: shotsToRemove)
+    {
+        delete shot;
+    }
 }
 
 void CollisionHandler::run()
 {
     while(!Config::finished)
     {
-        this->handleCollisions();
+        cout << "CollisionHafndler" << endl;
+        if (!Config::paused && !Config::gameOver)
+        {
+            this->handleCollisions();
+        }
+        cout << "CollisiofffffffffnHandler" << endl;
         Thread::yield();
     }
+        for (auto it = shotsToRemove.begin(); it != shotsToRemove.end();)
+        {
+            auto shot = *it;
+            it = shotsToRemove.erase(it);
+            delete shot;
+        }
 }
 
 void CollisionHandler::handleCollisions()
 {
+    if (player == nullptr)
+        return;
     this->handlePlayerEnemyCollisions();
     this->handleEnemyCollisions();
     this->handleShotCollisions();
@@ -40,12 +70,10 @@ void CollisionHandler::handleCollisions()
 
 void CollisionHandler::handlePlayerEnemyCollisions()
 {
-    if (player == nullptr || enemies.empty())
+   // playerSemaphore->p();
+    //enemySemaphore->p();
+    if (player == nullptr || enemies.size() == 0)
         return;
-
-    playerSemaphore->p();
-    enemySemaphore->p();
-
     for (auto enemy : enemies)
     {
         if (hasCollided(player, enemy))
@@ -55,13 +83,15 @@ void CollisionHandler::handlePlayerEnemyCollisions()
 
             Point enemyPos = enemy->getPreviousPosition();
             enemy->setPosition(enemyPos);
-
             player->collide(enemy->damageGiven);
+
+            if (player == nullptr)
+                break;
         }
     }
 
-    enemySemaphore->v();
-    playerSemaphore->v();
+    //enemySemaphore->v();
+    //playerSemaphore->v();
 }
 
 void CollisionHandler::handleEnemyCollisions()
@@ -72,19 +102,8 @@ void CollisionHandler::handleEnemyCollisions()
     {
         for (int j = i + 1; j < enemies.size(); j++)
         {
-            Enemy::avoidCollision(enemies[i], enemies[j]);
-
-            // Shouldn't be necessary, but just in case...
-            if (this->hasCollided(enemies[i], enemies[j]))
-            {
-                Enemy::moveSemaphore->p();
-                Point prevPos = enemies[i]->getPreviousPosition();
-                enemies[i]->setPosition(prevPos);
-
-                prevPos = enemies[j]->getPreviousPosition();
-                enemies[j]->setPosition(prevPos);
-                Enemy::moveSemaphore->v();
-            }
+            bool avoid = Enemy::avoidCollision(enemies[i], enemies[j]);
+            if (avoid) return;
         }
     }
 }
@@ -93,16 +112,17 @@ void CollisionHandler::handleShotCollisions()
 {
     if (shots.size() < 2)
         return;
-    for (int i = 0; i < enemies.size(); i++)
+    for (int i = 0; i < enemies.size()-1; i++)
     {
-        for (int j = i + 1; j < enemies.size(); j++)
+        for (int j = i + 1; j < enemies.size()-1; j++)
         {
-            if (shots[i]->getIsPlayerShot() || shots[j]->getIsPlayerShot())
+            if ((shots[i]->getIsPlayerShot() && shots[j]->getIsPlayerShot()) ||
+                (!shots[i]->getIsPlayerShot() && !shots[j]->getIsPlayerShot()))
             {
                 if (this->hasCollided(shots[i], shots[j]))
                 {
-                    shots[i]->removeFromGame();
-                    shots[j]->removeFromGame();
+                    shots[i]->collide();
+                    shots[j]->collide();
                 }
             }
         }
@@ -111,6 +131,8 @@ void CollisionHandler::handleShotCollisions()
     {
         if (shot->getIsPlayerShot())
         {
+            if (player == nullptr || enemies.empty())
+                break;
             for (auto enemy : enemies)
             {
                 if (this->hasCollided(shot, enemy))
@@ -127,6 +149,8 @@ void CollisionHandler::handleShotCollisions()
         }
         else
         {
+            if (player == nullptr)
+                break;
             if (this->hasCollided(shot, player))
             {
                 shot->removeFromGame();
@@ -140,8 +164,8 @@ bool CollisionHandler::hasCollided(Drawable *drawable1, Drawable *drawable2)
 {
     int firstSize = drawable1->getSize();
     Point firstPos = drawable1->getPosition();
-    int secondSize = drawable2->getSize();
     Point secondPos = drawable2->getPosition();
+    int secondSize = drawable2->getSize();
 
     return (abs(firstPos.x - secondPos.x) < (firstSize + secondSize) &&
             abs(firstPos.y - secondPos.y) < (firstSize + secondSize));
@@ -149,44 +173,55 @@ bool CollisionHandler::hasCollided(Drawable *drawable1, Drawable *drawable2)
 
 void CollisionHandler::addEnemy(Enemy* enemy)
 {
-    enemySemaphore->p();
+    //enemySemaphore->p();
     enemies.push_back(enemy);
-    enemySemaphore->v();
+    //enemySemaphore->v();
 }
 
 void CollisionHandler::addShot(Shot* shot)
 {
-    shotsSemaphore->p();
+    //shotsSemaphore->p();
     shots.push_back(shot);
-    shotsSemaphore->v();
+    //shotsSemaphore->v();
 }
 
 void CollisionHandler::addPlayer(Player* playerToAdd)
 {
-    playerSemaphore->p();
+    //playerSemaphore->p();
     CollisionHandler::player = playerToAdd;
-    playerSemaphore->v();
+    //playerSemaphore->v();
 }
 
 void CollisionHandler::removeEnemy(Enemy* enemy)
 {
-    enemySemaphore->p();
+    //enemySemaphore->p();
     enemies.erase(std::remove(enemies.begin(), enemies.end(), enemy), enemies.end());
-    enemySemaphore->v();
+    //enemySemaphore->v();
 }
 
 void CollisionHandler::removeShot(Shot* shot)
 {
-    shotsSemaphore->p();
+    //shotsSemaphore->p();
     shots.erase(std::remove(shots.begin(), shots.end(), shot), shots.end());
-    shotsSemaphore->v();
+    if (!CollisionHandler::isPointerInVector(shotsToRemove, shot))
+    {
+        shotsToRemove.push_back(shot);
+    }
+   //shotsSemaphore->v();
 }
 
 void CollisionHandler::removePlayer()
 {
-    playerSemaphore->p();
+    //playerSemaphore->p();
     CollisionHandler::player = nullptr;
-    playerSemaphore->v();
+    //playerSemaphore->v();
+}
+
+void CollisionHandler::restart()
+{
+    shots.clear();
+    enemies.clear();
+    player = nullptr;
 }
 
 __END_API

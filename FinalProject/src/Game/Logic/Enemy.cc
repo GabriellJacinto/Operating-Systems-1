@@ -1,50 +1,74 @@
 #include "Concurrency/traits.h"
 #include "Game/Logic/Enemy.h"
 #include "Game/Logic/Player.h"
-#include <cstdlib>  // For std::rand and std::srand
-#include <ctime>    // For std::time
+#include <cstdlib>
+#include <ctime>
 
 __BEGIN_API
 
 int Enemy::HALF_ENEMY_SIZE = 24;
-int Enemy::ENEMY_SIZE = 48;
+int Enemy::ENEMY_SIZE = 20;
 int Enemy::ENEMY_SPEED = 50;
-float Enemy::SHOT_COOLDOWN = 500;
+float Enemy::SHOT_COOLDOWN = 250;
+float Enemy::DIAGONAL_TIME = 500;
 float Enemy::RELIVE_TIME = 2000;
 Vector Enemy::SHOT_SPEED = Vector(0, 500);
 Semaphore* Enemy::isDeadSemaphore = new Semaphore();
 Semaphore* Enemy::moveSemaphore = new Semaphore();
-int Enemy::MINIMUM_DISTANCE = 20;
+int Enemy::MINIMUM_DISTANCE = 100;
+int Enemy::TARGET_DISTANCE = 150;
+float Enemy::RANDOM_MOVE_TIME = 1000;
 
-Enemy::Enemy(Algorithm algorithm, Player* player)
+// MAKE ENEMIES NOT GO TO OUTSIDE OFTEN
+
+Enemy::Enemy(Algorithm algorithm, Player* player, Point position)
 {
+    this->position = position;
     this->player = player;
     this->algorithm = algorithm;
     this->loadAndBindTexture();
     this->shotClock = std::make_unique<Clock>();
+    this->reliveClock = std::make_unique<Clock>();
+    this->diagonalClock = std::make_unique<Clock>();
+    this->randomMoveClock = std::make_unique<Clock>();
     this->direction = Shot::Direction::UP;
-    this->insertInGame();
+    Window::addElementToDraw(this);
+    CollisionHandler::addEnemy(this);
 }
 
 Enemy::~Enemy()
 {
-    delete Enemy::isDeadSemaphore;
-    delete Enemy::moveSemaphore;
+    if (Enemy::isDeadSemaphore != nullptr )
+    {
+        delete Enemy::isDeadSemaphore;
+        Enemy::isDeadSemaphore = nullptr;
+    }
+
+    if (Enemy::moveSemaphore != nullptr)
+    {
+        delete Enemy::moveSemaphore;
+        Enemy::moveSemaphore = nullptr;
+    }
 }
 
 void Enemy::insertInGame()
 {
-    Window::toBeDrawnSemaphore->p();
+    if (!_isDead)
+    {
+        return;
+    }
+    _isDead = false;
+    //Window::toBeDrawnSemaphore->p();
     Window::addElementToDraw(this);
-    Window::toBeDrawnSemaphore->v();
-    CollisionHandler::enemySemaphore->p();
+    //Window::toBeDrawnSemaphore->v();
+    //CollisionHandler::enemySemaphore->p();
     CollisionHandler::addEnemy(this);
-    CollisionHandler::enemySemaphore->v();
+    //CollisionHandler::enemySemaphore->v();
 }
 
 void Enemy::loadAndBindTexture()
 {
-    texture.loadFromFile("assets/Sprites/space_ships/enemy_space_ship1.png");
+    texture.loadFromFile("assets/sprites/space_ships/enemy_space_ship1.png");
     sprite.setTexture(texture);
     sprite.scale(-0.5, -0.5);
     sf::Vector2u textureSize = texture.getSize();
@@ -55,24 +79,18 @@ void Enemy::run()
 {
     while (!Config::finished)
     {
-        Enemy::isDeadSemaphore->p();
+        //Enemy::isDeadSemaphore->p();
         if (!this->_isDead)
         {
             this->processDirectionAlgorithm();
         }
         else
         {
-            if (reliveTime > RELIVE_TIME)
+            if (this->reliveClock->getElapsedTime() > RELIVE_TIME)
             {
-                this->reliveTime -= this->reliveClock->getElapsedTime();
-            }
-            else
-            {
-                this->_isDead = false;
                 this->insertInGame();
             }
         }
-
         Thread::yield();
     }
 }
@@ -80,24 +98,93 @@ void Enemy::run()
 void Enemy::processDirectionAlgorithm()
 {
     Shot::Direction directionToGo;
-    if (this->algorithm == Algorithm::A) {
-        directionToGo = this->directionAlgorithmA();
+    if(!this->avoidingCollision)
+    {
+        if (this->algorithm == Algorithm::A) {
+            directionToGo = this->directionAlgorithmA();
+        } else if(this->algorithm == Algorithm::B){
+            directionToGo = this->directionAlgorithmB();
+        }
     }
     else
     {
-        directionToGo = this->directionAlgorithmB();
+        directionToGo = this->direction;
     }
-    this->shoot(directionToGo);
+    switch (directionToGo)
+    {
+        case Shot::Direction::UP:
+            this->speed.y -= ENEMY_SPEED;
+            this->direction = Shot::Direction::UP;
+            break;
+        case Shot::Direction::DOWN:
+            this->speed.y += ENEMY_SPEED;
+            this->direction = Shot::Direction::DOWN;
+            break;
+        case Shot::Direction::LEFT:
+            this->speed.x -= ENEMY_SPEED;
+            this->direction = Shot::Direction::LEFT;
+            break;
+        case Shot::Direction::RIGHT:
+            this->speed.x += ENEMY_SPEED;
+            this->direction = Shot::Direction::RIGHT;
+            break;
+    }
+    this->shoot();
 }
 
-void Enemy::shoot(Shot::Direction directionToShoot)
+void Enemy::shoot()
 {
     if (this->shotClock->getElapsedTime() > SHOT_COOLDOWN)
     {
         this->shotClock->restart();
         Point shotPosition = this->position;
-        Shot::Direction shotDirection = directionToShoot;
-        Shot* shot = new Shot(shotPosition, SHOT_SPEED, shotDirection, true); // TEST: IS IT WORKING?
+        Shot::Direction shotDirection = this->direction;
+
+        switch (shotDirection)
+        {
+            case Shot::Direction::UP:
+                shotPosition.x += 7;
+                shotPosition.y -= 25;
+                break;
+            case Shot::Direction::DOWN:
+                shotPosition.x += 7;
+                shotPosition.y += 40;
+                break;
+            case Shot::Direction::LEFT:
+                shotPosition.x -= 25;
+                shotPosition.y += 7;
+                break;
+            case Shot::Direction::RIGHT:
+                shotPosition.x += 40;
+                shotPosition.y += 7;
+                break;
+        }
+
+        Shot* shot = new Shot(shotPosition, shotDirection, false);
+    }
+}
+
+Shot::Direction Enemy::getRandomDirection()
+{
+    // Seed the random number generator
+    std::srand(std::time(nullptr));
+
+    // Generate a random number between 0 and 3
+    int randomNum = std::rand() % 4;
+
+    // Map the random number to a direction
+    switch (randomNum) {
+        case 0:
+            return Shot::Direction::LEFT;
+        case 1:
+            return Shot::Direction::RIGHT;
+        case 2:
+            return Shot::Direction::UP;
+        case 3:
+            return Shot::Direction::DOWN;
+        default:
+            // Handle an unexpected random number (should not occur)
+            return Shot::Direction::UP;  // or any default direction
     }
 }
 
@@ -109,11 +196,10 @@ void Enemy::draw(sf::RenderWindow &window, double diffTime)
 
 void Enemy::collide(int damage)
 {
-    Enemy::isDeadSemaphore->p();
+    //Enemy::isDeadSemaphore->p();
     this->reliveClock->restart();
     this->_isDead = true;
-    this->reliveTime = RELIVE_TIME;
-    Enemy::isDeadSemaphore->v();
+    //Enemy::isDeadSemaphore->v();
     this->removeFromGame();
 }
 
@@ -124,13 +210,13 @@ void Enemy::update(double diffTime)
 
 void Enemy::move(double diffTime)
 {
-    Enemy::moveSemaphore->p();
+    //Enemy::moveSemaphore->p();
     this->previousPosition = this->position;
     this->position = this->position + this->speed * diffTime;
     this->updateSprite();
     this->speed = Vector(0, 0);
     this->handleOutOfBounds();
-    Enemy::moveSemaphore->v();
+    //Enemy::moveSemaphore->v();
 }
 
 void Enemy::updateSprite()
@@ -139,10 +225,10 @@ void Enemy::updateSprite()
     switch (this->direction)
     {
         case Shot::Direction::UP:
-            this->sprite.setRotation(0);
+            this->sprite.setRotation(180);
             break;
         case Shot::Direction::DOWN:
-            this->sprite.setRotation(180);
+            this->sprite.setRotation(0);
             break;
         case Shot::Direction::LEFT:
             this->sprite.setRotation(90);
@@ -153,48 +239,104 @@ void Enemy::updateSprite()
     }
 }
 
-Shot::Direction Enemy::directionAlgorithmA() {
+Shot::Direction Enemy::directionAlgorithmA()
+{
     Point A = this->getPosition();
     Point B = this->player->position;
 
     double dx = B.x - A.x;
     double dy = B.y - A.y;
 
-    if (std::abs(dx) > std::abs(dy)) {
-        if (dx > 0)
-            return Shot::RIGHT;
-        else
-            return Shot::LEFT;
-    } else {
-        if (dy > 0)
-            return Shot::UP;
-        else
-            return Shot::DOWN;
+    double minDistanceToBoundary = 20.0;
+
+    double distanceToPlayer = std::sqrt(dx * dx + dy * dy);
+    if (distanceToPlayer < minDistanceToBoundary)
+        return directionAlgorithmB();
+
+    double normalizedDx = dx / distanceToPlayer;
+    double normalizedDy = dy / distanceToPlayer;
+
+    double targetX = B.x - minDistanceToBoundary * normalizedDx;
+    double targetY = B.y - minDistanceToBoundary * normalizedDy;
+
+    bool isDiagonal = std::abs(targetX - A.x) > std::abs(targetY - A.y);
+
+    if (!isDiagonal)
+    {
+        if (std::abs(targetX - A.x) > std::abs(targetY - A.y)) {
+            if (targetX > A.x)
+                return Shot::RIGHT;
+            else
+                return Shot::LEFT;
+        } else {
+            if (targetY > A.y)
+                return Shot::DOWN;
+            else
+                return Shot::UP;
+        }
     }
+    else if(this->diagonalClock->getElapsedTime() > DIAGONAL_TIME)
+    {
+        this->diagonalClock->restart();
+
+        if (std::abs(targetX - A.x) > std::abs(targetY - A.y)) {
+            if (targetX > A.x)
+                return Shot::RIGHT;
+            else
+                return Shot::LEFT;
+        } else {
+            if (targetY > A.y)
+                return Shot::DOWN;
+            else
+                return Shot::UP;
+        }
+    }
+    return this->direction;
 }
 
 Shot::Direction Enemy::directionAlgorithmB()
 {
-    // Seed the random number generator
-    std::srand(std::time(nullptr));
+        Point currentPosition = this->getPosition();
+        double minDistanceToBoundary = 50;  // Adjust this value as desired
 
-    // Generate a random number between 0 and 3
-    int randomNum = std::rand() % 4;
+        bool closeToLeftBoundary = currentPosition.x < 20 + minDistanceToBoundary;
+        bool closeToRightBoundary = currentPosition.x > Config::playableAreaWidth - 20 - minDistanceToBoundary;
+        bool closeToTopBoundary = currentPosition.y < 20 + minDistanceToBoundary;
+        bool closeToBottomBoundary = currentPosition.y > Config::playableAreaHeight - 20 - minDistanceToBoundary;
 
-    // Map the random number to a direction
-    switch (randomNum) {
-        case 0:
-            return Shot::LEFT;
-        case 1:
-            return Shot::RIGHT;
-        case 2:
-            return Shot::UP;
-        case 3:
-            return Shot::DOWN;
-        default:
-            // Handle an unexpected random number (should not occur)
-            return Shot::LEFT;  // or any default direction
+        // If the enemy is already close to a boundary, return the opposite direction
+        if (closeToLeftBoundary) {
+            return Shot::RIGHT;}
+        else if (closeToRightBoundary) {
+            return Shot::LEFT;}
+        else if (closeToTopBoundary){
+            return Shot::DOWN;}
+        else if (closeToBottomBoundary) {
+            return Shot::UP;}
+
+    if (randomMoveClock->getElapsedTime() > RANDOM_MOVE_TIME)
+    {
+        randomMoveClock->restart();
+        // Seed the random number generator
+        std::srand(std::time(nullptr));
+
+        // Generate a random number between 0 and 3
+        int randomNum = std::rand() % 4;
+
+
+        // Randomly select a direction while avoiding getting too close to the boundaries
+        switch (randomNum) {
+            case 0:
+                return Shot::LEFT;
+            case 1:
+                return Shot::RIGHT;
+            case 2:
+                return Shot::UP;
+            case 3:
+                return Shot::DOWN;
+        }
     }
+    return this->direction;
 }
 
 bool Enemy::isOutOfPlay()
@@ -214,12 +356,12 @@ Point Enemy::getPosition()
 
 void Enemy::removeFromGame()
 {
-    Window::toBeDrawnSemaphore->p();
+    //Window::toBeDrawnSemaphore->p();
     Window::removeElementToDraw(this);
-    Window::toBeDrawnSemaphore->v();
-    CollisionHandler::enemySemaphore->p();
+    //Window::toBeDrawnSemaphore->v();
+    //CollisionHandler::enemySemaphore->p();
     CollisionHandler::removeEnemy(this);
-    CollisionHandler::enemySemaphore->v();
+    //CollisionHandler::enemySemaphore->v();
 }
 
 void Enemy::handleOutOfBounds()
@@ -246,43 +388,56 @@ Point Enemy::getPreviousPosition()
 
 void Enemy::setPosition(const Point &newPosition)
 {
+    cout << "Enemy::setPosition" << endl;
+    cout << "newPosition.x: " << newPosition.x << endl;
     this->position = newPosition;
 }
 
-void Enemy::avoidCollision(Enemy* enemy1, Enemy* enemy2)
+bool Enemy::avoidCollision(Enemy* enemy1, Enemy* enemy2)
 {
     Vector enemyVector = enemy2->getPosition() - enemy1->getPosition();
 
     double distance = enemyVector.length();
 
-    if (distance < MINIMUM_DISTANCE)
+    if (distance < MINIMUM_DISTANCE && !enemy1->avoidingCollision && !enemy2->avoidingCollision)
     {
-        double desiredDistance = MINIMUM_DISTANCE;
+        enemy1->avoidingCollision = true;
+        enemy2->avoidingCollision = true;
 
-        Vector correctionVector = (enemyVector / distance) * (desiredDistance - distance);
-
-        Enemy::moveSemaphore->p();
-
-        if (correctionVector.x > 0) {
-            enemy1->direction = Shot::Direction::RIGHT;
-            enemy2->direction = Shot::Direction::LEFT;
-        } else if (correctionVector.x < 0) {
-            enemy1->direction = Shot::Direction::LEFT;
-            enemy2->direction = Shot::Direction::RIGHT;
-        } else if (correctionVector.y > 0) {
-            enemy1->direction = Shot::Direction::DOWN;
-            enemy2->direction = Shot::Direction::UP;
-        } else if (correctionVector.y < 0) {
-            enemy1->direction = Shot::Direction::UP;
-            enemy2->direction = Shot::Direction::DOWN;
+        if (enemy1->direction == enemy2->direction)
+        {
+            enemy1->inverseDirection();
         }
-        enemy1->setPosition(enemy1->getPosition() + correctionVector);
-        enemy1->updateSprite();
-        enemy2->setPosition(enemy2->getPosition() - correctionVector);
-        enemy2->updateSprite();
+        else
+        {
+            enemy1->inverseDirection();
+            enemy2->inverseDirection();
+        }
 
-        Enemy::moveSemaphore->v();
+        //Enemy::moveSemaphore->v();
+        return true;
     }
+    else if (distance >= TARGET_DISTANCE && enemy1->avoidingCollision && enemy2->avoidingCollision)
+    {
+        enemy1->avoidingCollision = false;
+        enemy2->avoidingCollision = false;
+
+        return false;
+    }
+    return false;
+}
+
+void Enemy::inverseDirection()
+{
+    Shot::Direction dir = this->direction;
+    if (dir == Shot::UP)
+        this->direction = Shot::DOWN;
+    else if (dir == Shot::DOWN)
+        this->direction = Shot::UP;
+    else if (dir == Shot::LEFT)
+        this->direction = Shot::RIGHT;
+    else if (dir == Shot::RIGHT)
+        this->direction = Shot::LEFT;
 }
 
 __END_API

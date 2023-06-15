@@ -9,15 +9,15 @@ namespace Play
 {
     enum KeyPress
     {
-        UP,
-        DOWN,
-        RIGHT,
-        LEFT,
-        SHOOT,
-        QUIT,
-        RESTART,
-        PAUSE,
-        NONE
+        UP = 0,
+        DOWN = 1,
+        RIGHT = 2,
+        LEFT = 3,
+        SHOOT = 4,
+        QUIT = 5,
+        RESTART = 6,
+        PAUSE = 7,
+        NONE = 8
     };
 }
 

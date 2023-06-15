@@ -1,5 +1,6 @@
 #include "Game/Logic/Point.h"
 #include "Game/Logic/Vector.h"
+#include <iostream>
 
 __BEGIN_API
 

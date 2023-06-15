@@ -24,10 +24,11 @@ public:
     enum Algorithm
     {
         A,
-        B
+        B,
+        C
     };
 
-    Enemy(Algorithm algorithm, Player* player);
+    Enemy(Algorithm algorithm, Player* player, Point position);
 
     ~Enemy() override;
 
@@ -48,26 +49,37 @@ public:
 
     int damageGiven = 1;
 
-    static void avoidCollision(Enemy* enemy1, Enemy* enemy2);
+    static bool avoidCollision(Enemy* enemy1, Enemy* enemy2);
 
     static int ENEMY_SPEED;
 
+    void inverseDirection();
+
+    bool avoidingCollision = false;
+    static int ENEMY_SIZE;
+
+    void insertInGame();
+
+    Point previousPosition;
 private:
     static int HALF_ENEMY_SIZE;
-    static int ENEMY_SIZE;
     static float SHOT_COOLDOWN;
     static float RELIVE_TIME;
+    static float DIAGONAL_TIME;
     static Vector SHOT_SPEED;
     static int MINIMUM_DISTANCE;
+    static int TARGET_DISTANCE;
+    static float RANDOM_MOVE_TIME;
 
     std::unique_ptr<Clock> shotClock;
     std::unique_ptr<Clock> reliveClock;
+    std::unique_ptr<Clock> diagonalClock;
+    std::unique_ptr<Clock> randomMoveClock;
 
     Player* player;
     bool _isDead = false;
-    float reliveTime = 0;
+    Enemy* previousEnemyCollided = nullptr;
     Algorithm algorithm;
-    Point previousPosition;
 
     void processDirectionAlgorithm();
     Shot::Direction directionAlgorithmA();
@@ -75,10 +87,10 @@ private:
     void move(double diffTime);
     void handleOutOfBounds();
     void updateSprite();
-    void shoot(Shot::Direction direction);
-    void insertInGame();
-    void removeFromGame();
+    void shoot();
+    Shot::Direction getRandomDirection();
 
+    void removeFromGame();
 
     void loadAndBindTexture();
 

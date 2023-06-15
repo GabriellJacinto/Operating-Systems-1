@@ -5,6 +5,8 @@
 #include "Concurrency/semaphore.h"
 #include "Concurrency/thread.h"
 #include "Concurrency/traits.h"
+#include "Game/Control/Clock.h"
+#include <memory>
 
 __BEGIN_API
 
@@ -16,7 +18,7 @@ class Player;
 class CollisionHandler
 {
 public:
-    CollisionHandler() = default;
+    CollisionHandler();
     ~CollisionHandler();
 
     static Semaphore* playerSemaphore;
@@ -33,16 +35,34 @@ public:
     static void removeShot(Shot* shot);
     static void removePlayer();
 
+    void restart();
+
 private:
-    static Player* player;
     static vector<Enemy*> enemies;
+    static Player* player;
     static vector<Shot*> shots;
+    static vector<Shot*> shotsToRemove;
+    static float ENEMY_COLLISION_TIME;
+    unique_ptr<Clock> enemyCollisionClock;
 
     void handleCollisions();
     void handlePlayerEnemyCollisions();
     void handleEnemyCollisions();
     void handleShotCollisions();
     bool hasCollided(Drawable* drawable1, Drawable* drawable2);
+
+    template<typename T>
+    static bool isPointerInVector(const std::vector<T*>& vec, const T* ptr)
+    {
+        for (const auto& element : vec)
+        {
+            if (element == ptr)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 
 };
 

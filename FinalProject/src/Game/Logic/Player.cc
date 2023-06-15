@@ -5,27 +5,32 @@
 #include "SFML/Graphics.hpp"
 #include "Game/Interface/window.h"
 #include "Game/Logic/Shot.h"
+#include "Game/Control/BrickShooter.h"
 
 __BEGIN_API
 
 int Player::HALF_PLAYER_SIZE = 24;
-int Player::PLAYER_SIZE = 48;
+int Player::PLAYER_SIZE = 20;
 int Player::PLAYER_SPEED = 250;
-float Player::SHOT_COOLDOWN = 100;
-Vector Player::SHOT_SPEED = Vector(0, 500);
-float Player::INVULNERABILITY_TIME = 1000;
+float Player::SHOT_COOLDOWN = 500;
+float Player::INVULNERABILITY_TIME = 3.0;
+float Player::HIT_ANIMATION_TIME = 150;
 Semaphore* Player::lifeSemaphore = new Semaphore();
 Semaphore* Player::invulnerabilitySemaphore = new Semaphore();
 Semaphore* Player::moveSemaphore = new Semaphore();
 
 Player::Player(KeyboardHandler* keyboardHandler)
 {
+    this->position = Point((float)Config::playableAreaWidth / 2, (float)Config::playableAreaHeight / 2);
     this->keyboardHandler = keyboardHandler;
     this->loadAndBindTexture();
     this->shotClock = std::make_unique<Clock>();
     this->invulnerabilityTime = INVULNERABILITY_TIME;
     this->direction = Shot::Direction::UP;
-    this->insertInGame();
+    this->life = 3;
+    Window::addElementToDraw(this);
+    CollisionHandler::addPlayer(this);
+    drawDamagedPlayerClock = std::make_unique<Clock>();
 }
 
 Player::~Player()
@@ -38,17 +43,20 @@ Player::~Player()
 void Player::insertInGame()
 {
     this->life = 3;
-    Window::toBeDrawnSemaphore->p();
+    //Window::toBeDrawnSemaphore->p();
     Window::addElementToDraw(this);
-    Window::toBeDrawnSemaphore->v();
-    CollisionHandler::playerSemaphore->p();
+    //::toBeDrawnSemaphore->v();
+    //CollisionHandler::playerSemaphore->p();
     CollisionHandler::addPlayer(this);
-    CollisionHandler::playerSemaphore->v();
+    //CollisionHandler::playerSemaphore->v();
+    this->keyboardHandler->saveEvents = true;
+    this->position = Point((float)Config::playableAreaWidth / 2, (float)Config::playableAreaHeight / 2);
+    this->invulnerable = false;
 }
 
 void Player::loadAndBindTexture()
 {
-    texture.loadFromFile("assets/Sprites/space_ships/space_ship1.png");
+    texture.loadFromFile("assets/sprites/space_ships/space_ship1.png");
     sprite.setTexture(texture);
     sprite.scale(-0.5, -0.5);
     sf::Vector2u textureSize = texture.getSize();
@@ -59,30 +67,47 @@ void Player::run()
 {
     while (!Config::finished)
     {
-        this->processKeyboardInput();
+        if (!Config::gameOver)
+        {
+            this->processKeyboardInput();
+        }
         Thread::yield();
     }
 }
 
 void Player::draw(sf::RenderWindow &window, double diffTime)
 {
-    window.draw(this->sprite);
+    if (invulnerable)
+    {
+        if (drawDamagedPlayerClock->getElapsedTime() < HIT_ANIMATION_TIME)
+        {
+            handleInvulnerability(diffTime);
+            return;
+        }
+        else
+        {
+            drawDamagedPlayerClock->restart();
+        }
+    }
     this->update(diffTime);
+    window.draw(this->sprite);
 }
 
 void Player::update(double diffTime)
 {
     this->move(diffTime);
-    Player::invulnerabilitySemaphore->p();
+
+    handleInvulnerability(diffTime);
+}
+
+void Player::handleInvulnerability(double diffTime)
+{
     if (this->invulnerable)
     {
-        Player::invulnerabilitySemaphore->v();
         this->invulnerabilityTime -= diffTime;
         if (this->invulnerabilityTime <= 0)
         {
-            Player::invulnerabilitySemaphore->p();
             this->invulnerable = false;
-            Player::invulnerabilitySemaphore->v();
             this->invulnerabilityTime = INVULNERABILITY_TIME;
         }
     }
@@ -94,10 +119,10 @@ void Player::updateSprite()
     switch (this->direction)
     {
         case Shot::Direction::UP:
-            this->sprite.setRotation(0);
+            this->sprite.setRotation(180);
             break;
         case Shot::Direction::DOWN:
-            this->sprite.setRotation(180);
+            this->sprite.setRotation(0);
             break;
         case Shot::Direction::LEFT:
             this->sprite.setRotation(90);
@@ -110,36 +135,30 @@ void Player::updateSprite()
 
 void Player::move(double diffTime)
 {
-    Player::moveSemaphore->p();
+    //Player::moveSemaphore->p();
     this->previousPosition = this->position;
     this->position = this->position + this->speed * diffTime;
-    this->updateSprite();
     this->speed = Vector(0, 0);
+    this->updateSprite();
     this->handleOutOfBounds();
-    Player::moveSemaphore->v();
+    //Player::moveSemaphore->v();
 }
 
 void Player::collide(int damage)
 {
-    Player::invulnerabilitySemaphore->p();
     if (invulnerable)
-    {
-        Player::invulnerabilitySemaphore->v();
         return;
-    }
-    Player::lifeSemaphore->p();
-    this->life -= damage;
-    Player::lifeSemaphore->v();
 
-    Player::invulnerabilitySemaphore->p();
+    this->life -= damage;
+    Info::decreaseLives(*BrickShooter::info);
+
     this->invulnerable = true;
-    Player::invulnerabilitySemaphore->v();
+    this->invulnerabilityTime = INVULNERABILITY_TIME;
+    this->drawDamagedPlayerClock->restart();
 
     if (this->isDead())
     {
-        Config::gameOverSemaphore->p();
         Config::gameOver = true;
-        Config::gameOverSemaphore->v();
         this->removeFromGame();
     }
 }
@@ -154,10 +173,19 @@ bool Player::isDead()
     return this->life <= 0; // CHECK
 }
 
-void Player::processKeyboardInput()
+void Player::processKeyboardInput() {
+    //KeyboardHandler::eventQueueSemaphore->p();
+    KeyboardHandler::keys eventToProcess = this->keyboardHandler->getNextKey();
+
+    Play::KeyPress event1 = eventToProcess.moveKey;
+    Play::KeyPress event2 = eventToProcess.actionKey;
+
+    processKey(event1);
+    processKey(event2);
+}
+
+void Player::processKey(Play::KeyPress eventToProcess)
 {
-    KeyboardHandler::eventQueueSemaphore->p();
-    Play::KeyPress eventToProcess = this->keyboardHandler->getNextKey();
     switch (eventToProcess) {
         case Play::KeyPress::UP:
             this->speed.y -= PLAYER_SPEED;
@@ -179,7 +207,7 @@ void Player::processKeyboardInput()
             this->shoot(this->direction);
             break;
     }
-    KeyboardHandler::eventQueueSemaphore->v();
+    //KeyboardHandler::eventQueueSemaphore->v();
 }
 
 void Player::shoot(Shot::Direction directionToShoot)
@@ -189,7 +217,28 @@ void Player::shoot(Shot::Direction directionToShoot)
         this->shotClock->restart();
         Point shotPosition = this->position;
         Shot::Direction shotDirection = directionToShoot;
-        Shot* shot = new Shot(shotPosition, SHOT_SPEED, shotDirection, true); // TEST: IS IT WORKING?
+
+        switch (shotDirection)
+        {
+            case Shot::Direction::UP:
+                shotPosition.x += 7;
+                shotPosition.y -= 25;
+                break;
+            case Shot::Direction::DOWN:
+                shotPosition.x += 7;
+                shotPosition.y += 40;
+                break;
+            case Shot::Direction::LEFT:
+                shotPosition.x -= 25;
+                shotPosition.y += 7;
+                break;
+            case Shot::Direction::RIGHT:
+                shotPosition.x += 40;
+                shotPosition.y += 7;
+                break;
+        }
+
+        Shot* shot = new Shot(shotPosition, shotDirection, true); // TEST: IS IT WORKING?
     }
 }
 
@@ -210,12 +259,12 @@ Point Player::getPosition()
 
 void Player::removeFromGame()
 {
-    Window::toBeDrawnSemaphore->p();
+    //Window::toBeDrawnSemaphore->p();
     Window::removeElementToDraw(this);
-    Window::toBeDrawnSemaphore->v();
-    CollisionHandler::playerSemaphore->p();
+    //Window::toBeDrawnSemaphore->v();
+    //CollisionHandler::playerSemaphore->p();
     CollisionHandler::removePlayer();
-    CollisionHandler::playerSemaphore->v();
+    //CollisionHandler::playerSemaphore->v();
     this->keyboardHandler->saveEvents = false;
 }
 
@@ -231,7 +280,7 @@ void Player::handleOutOfBounds()
         this->position.y = PLAYER_SIZE;
 }
 
-void Player::setInitialPosition(const Point& initialPosition)
+void Player::setInitialPosition(Point initialPosition)
 {
     this->position = initialPosition;
     this->updateSprite();

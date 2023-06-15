@@ -14,14 +14,14 @@ void Clock::restart()
 {
     this->previousTime = 0;
     this->clock.restart();
-    float currentTime = this->clock.getElapsedTime().asSeconds();
-    this->previousTime = currentTime;
+    double currentTime = this->clock.getElapsedTime().asMilliseconds();
+    double previousTime = currentTime;
 }
 
-float Clock::getElapsedTime()
+double Clock::getElapsedTime()
 {
-    float currentTime = this->clock.getElapsedTime().asSeconds();
-    float elapsedTime = currentTime - this->previousTime;
+    double currentTime = this->clock.getElapsedTime().asMilliseconds();
+    double elapsedTime = currentTime - this->previousTime;
     return elapsedTime;
 }
 

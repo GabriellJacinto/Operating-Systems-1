@@ -8,6 +8,7 @@
 #include <list>
 #include "Game/Interface/Drawable.h"
 #include "Concurrency/semaphore.h"
+#include "Game/Control/Clock.h"
 
 __BEGIN_API
 
@@ -23,6 +24,8 @@ public:
     void quit();
 
     void pause();
+
+    void close();
 
     void drawElements(double d);
 
@@ -46,9 +49,10 @@ private:
     void drawGameOver();
     void drawBackground();
 
+    bool closed = false;
     float lastTime;
     sf::RenderWindow* window;
-    static std::list<Drawable*> toBeDrawn;
+    static std::vector<Drawable*> toBeDrawn;
     bool paused = false;
     sf::Clock clock;
     sf::Texture maze_tex;

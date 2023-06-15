@@ -27,7 +27,7 @@ public:
     ~Player() override;
 
     void run();
-    void setInitialPosition(const Point& position);
+    void setInitialPosition(Point position);
     void draw(sf::RenderWindow &window, double diffTime) override;
     void collide(int damage) override;
     bool isDead() override;
@@ -44,14 +44,17 @@ public:
     static Semaphore* invulnerabilitySemaphore;
     static Semaphore* moveSemaphore;
 
+    void removeFromGame();
+
 private:
     friend class Enemy;
+    friend class Shot;
 
     static int HALF_PLAYER_SIZE;
     static int PLAYER_SIZE;
     static int PLAYER_SPEED;
     static float SHOT_COOLDOWN;
-    static Vector SHOT_SPEED;
+    static float HIT_ANIMATION_TIME;
 
     KeyboardHandler* keyboardHandler;
     std::unique_ptr<Clock> shotClock;
@@ -64,11 +67,14 @@ private:
 
     void move(double diffTime);
     void handleOutOfBounds();
-    void removeFromGame();
+    void handleInvulnerability(double diffTime);
+
     void updateSprite();
     void processKeyboardInput();
+    void processKey(Play::KeyPress key);
     void shoot(Shot::Direction direction);
 
+    std::unique_ptr<Clock> drawDamagedPlayerClock;
     sf::Sprite sprite;
     sf::Texture texture;
     Vector speed;

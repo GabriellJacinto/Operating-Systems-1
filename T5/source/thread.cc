@@ -248,6 +248,7 @@ void Thread::thread_exit(int exit_code)
     if (_waiting)
     {
         _waiting->resume();
+        _waiting = nullptr;
     }
     
     yield(); // Libera o processador para outra thread(DISPACHER).
