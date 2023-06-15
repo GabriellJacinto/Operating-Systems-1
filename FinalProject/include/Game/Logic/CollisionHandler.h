@@ -47,6 +47,9 @@ private:
     void handleCollisions();
     void handlePlayerEnemyCollisions();
     void handleShotCollisions();
+    void handleShotShotCollisions();
+    void handleEnemyShotCollisions(Shot* shot);
+    void handlePlayerShotCollisions(Shot* shot);
     bool hasCollided(Drawable* drawable1, Drawable* drawable2);
 
     template<typename T>

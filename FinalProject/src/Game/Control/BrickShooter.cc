@@ -42,9 +42,11 @@ void BrickShooter::play(void * name)
     {
         enemyThread->join();
     }
+
     windowThread->join();
     playerThread->join();
     keyboardHandlerThread->join();
+
     // Delete game objects and threads
     Config::deleteSemaphores();
     delete window;
@@ -149,9 +151,9 @@ void BrickShooter::restart()
     player->removeFromGame();
     player->insertInGame();
 
-    Config::gameOverSemaphore->p();
+    //Config::gameOverSemaphore->p();
     Config::gameOver = false;
-    Config::gameOverSemaphore->v();
+    //Config::gameOverSemaphore->v();
 
     enemies[0]->setPosition(Point(100, 100));
     enemies[0]->previousPosition= Point(100, 100);
@@ -166,8 +168,6 @@ void BrickShooter::restart()
         enemy->insertInGame();
 
     collisionHandler->restart();
-    for (auto enemy : enemies)
-        CollisionHandler::addEnemy(enemy);
     CollisionHandler::addPlayer(player);
 
     Enemy::ENEMY_SPEED = 25;

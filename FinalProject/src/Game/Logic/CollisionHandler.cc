@@ -56,7 +56,7 @@ void CollisionHandler::run()
     }
 }
 
-void CollisionHandler::handleCollisions()
+inline void CollisionHandler::handleCollisions()
 {
     if (player == nullptr)
         return;
@@ -64,7 +64,7 @@ void CollisionHandler::handleCollisions()
     this->handleShotCollisions();
 }
 
-void CollisionHandler::handlePlayerEnemyCollisions()
+inline void CollisionHandler::handlePlayerEnemyCollisions()
 {
    // playerSemaphore->p();
     //enemySemaphore->p();
@@ -92,7 +92,23 @@ void CollisionHandler::handlePlayerEnemyCollisions()
     //playerSemaphore->v();
 }
 
-void CollisionHandler::handleShotCollisions()
+inline void CollisionHandler::handleShotCollisions()
+{
+    handleShotShotCollisions();
+    for (auto shot : shots)
+    {
+        if (shot->getIsPlayerShot())
+        {
+            handleEnemyShotCollisions(shot);
+        }
+        else
+        {
+            handlePlayerShotCollisions(shot);
+        }
+    }
+}
+
+inline void CollisionHandler::handleShotShotCollisions()
 {
     if (shots.size() < 2)
         return;
@@ -111,57 +127,65 @@ void CollisionHandler::handleShotCollisions()
             }
         }
     }
-    for (auto shot : shots)
+}
+
+inline void CollisionHandler::handleEnemyShotCollisions(Shot* shot)
+{
+    if (player == nullptr || enemies.empty())
+        return;
+    for (auto enemy : enemies)
     {
-        if (shot->getIsPlayerShot())
+        if (this->hasCollided(shot, enemy))
         {
-            if (player == nullptr || enemies.empty())
-                break;
-            for (auto enemy : enemies)
+            shot->removeFromGame();
+            if (!enemy->isDead())
             {
-                if (this->hasCollided(shot, enemy))
-                {
-                    shot->removeFromGame();
-                    if (!enemy->isDead())
-                    {
-                        enemy->collide(shot->getDamage());
-                        BrickShooter::increaseScore();
-                        if (BrickShooter::shouldLevelUp()) {
-                            BrickShooter::increaseLevel(enemies);
-                        }
-                    }
-                }
-            }
-        }
-        else
-        {
-            if (player == nullptr)
-                break;
-            if (this->hasCollided(shot, player))
-            {
-                shot->removeFromGame();
-                player->collide(shot->getDamage());
-            }
-            if (enemies.empty())
-                break;
-            for (auto enemy : enemies)
-            {
-                if (this->hasCollided(shot, enemy))
-                {
-                    shot->removeFromGame();
+                enemy->collide(shot->getDamage());
+                BrickShooter::increaseScore();
+                if (BrickShooter::shouldLevelUp()) {
+                    BrickShooter::increaseLevel(enemies);
                 }
             }
         }
     }
 }
 
-bool CollisionHandler::hasCollided(Drawable *drawable1, Drawable *drawable2)
+inline void CollisionHandler::handlePlayerShotCollisions(SOLUTION::Shot *shot)
 {
-    sf::FloatRect firstBounds = drawable1->getGlobalBounds();
-    sf::FloatRect secondBounds = drawable2->getGlobalBounds();
+    if (player == nullptr)
+        return;
+    if (this->hasCollided(shot, player))
+    {
+        shot->removeFromGame();
+        player->collide(shot->getDamage());
+    }
+    if (enemies.empty())
+        return;
+    for (auto enemy : enemies)
+    {
+        if (this->hasCollided(shot, enemy))
+        {
+            shot->removeFromGame();
+        }
+    }
+}
 
-    bool isColliding = firstBounds.intersects(secondBounds);
-    return isColliding;
+// All collidable objects are squares
+inline bool CollisionHandler::hasCollided(Drawable* drawable1, Drawable* drawable2)
+{
+    Point pos1 = drawable1->getPosition();
+    Point pos2 = drawable2->getPosition();
+    int L1 = drawable1->getSize();
+    int L2 = drawable2->getSize();
+
+    Vector pathVector = pos1 - pos2;
+    double distance = pathVector.length();
+
+    if (distance < (L1 + L2)/2)
+    {
+        return true;
+    }
+    return false;
 }
 
 void CollisionHandler::addEnemy(Enemy* enemy)
@@ -212,8 +236,12 @@ void CollisionHandler::removePlayer()
 
 void CollisionHandler::restart()
 {
-    shots.clear();
-    enemies.clear();
+    for (auto it = shots.begin(); it != shots.end();)
+    {
+        auto shot = *it;
+        it = shots.erase(it);
+        shot->removeFromGame();
+    }
     player = nullptr;
 }
 

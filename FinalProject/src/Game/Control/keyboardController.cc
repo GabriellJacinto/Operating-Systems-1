@@ -89,7 +89,7 @@ KeyboardHandler::keys KeyboardHandler::getNextKey()
     return keys;
 }
 
-KeyboardHandler::keys KeyboardHandler::getPressedKey()
+inline KeyboardHandler::keys KeyboardHandler::getPressedKey()
 {
     sf::Event event;
     window->getWindow()->pollEvent(event);

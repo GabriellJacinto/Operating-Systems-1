@@ -5,35 +5,34 @@
 #include "thread.h"
 #include "traits.h"
 #include "debug.h"
-#include "list.h"
-
 
 __BEGIN_API
 
-    class Semaphore
-    {
-    public:
-        typedef Ordered_List<Thread> Sleep_queue;
-        Semaphore(int v = 1) : _value(v) {}; // valor padrão 1, caso especificado, muda _value
-        ~Semaphore();
+class Semaphore
+{
+public:
+    typedef std::queue<Thread*> Asleep_Queue;
 
-        void p();
-        void v();
-    private:
-        // Atomic operations
-        int finc(volatile int & number);
-        int fdec(volatile int & number);
+    Semaphore(int v = 1) : _value(v) {}
+    ~Semaphore();
 
-        // Thread operations
-        void sleep();
-        void wakeup();
-        void wakeup_all();
+    void p();
+    void v();
 
-    private:
-        //DECLARAÇÃO DOS ATRIBUTOS DO SEMÁFORO
-        Sleep_queue _sleeping;
-        volatile int _value;
-    };
+private:
+    // Atomic operations
+    int finc(volatile int & number);
+    int fdec(volatile int & number);
+
+    // Thread operations
+    void sleep();
+    void wakeup();
+    void wakeup_all();
+
+private:
+    Asleep_Queue _asleep;
+    volatile int _value;
+};
 
 __END_API
 

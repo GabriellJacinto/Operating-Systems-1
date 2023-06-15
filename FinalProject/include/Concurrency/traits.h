@@ -17,10 +17,6 @@ class System;
 class Main;
 class Lists;
 class Semaphore;
-class KeyboardHandler;
-class Window;
-class fpsController;
-class BrickShooter;
 
 // Declaracao da classe Traits
 template<typename T> struct Traits {
@@ -57,22 +53,6 @@ template <> struct Traits<Lists> : public Traits<void> {
 };
 
 template <> struct Traits<Semaphore> : public Traits<void> {
-    static const bool debugged = false;
-};
-
-template <> struct Traits<KeyboardHandler> : public Traits<void> {
-    static const bool debugged = false;
-};
-
-template <> struct Traits<Window> : public Traits<void> {
-    static const bool debugged = false;
-};
-
-template <> struct Traits<fpsController> : public Traits<void> {
-    static const bool debugged = false;
-};
-
-template <> struct Traits<BrickShooter> : public Traits<void> {
     static const bool debugged = false;
 };
 

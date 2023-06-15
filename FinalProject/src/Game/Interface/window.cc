@@ -43,7 +43,7 @@ void Window::pause()
     this->paused = !this->paused;
 }
 
-void Window::drawElements(double d)
+inline void Window::drawElements(double d)
 {
     //toBeDrawnSemaphore->p();
     for (Drawable* element : toBeDrawn)
@@ -52,7 +52,7 @@ void Window::drawElements(double d)
     }
 }
 
-void Window::drawInfo()
+inline void Window::drawInfo()
 {
     Info::Info* info = BrickShooter::info;
     int score = info->score;
@@ -114,12 +114,12 @@ void Window::addElementToDraw(Drawable* element)
     //toBeDrawnSemaphore->v();
 }
 
-    void Window::removeElementToDraw(Drawable* element)
-    {
-        //toBeDrawnSemaphore->p();
-        toBeDrawn.erase(std::remove(toBeDrawn.begin(), toBeDrawn.end(), element), toBeDrawn.end());
-        //toBeDrawnSemaphore->v();
-    }
+void Window::removeElementToDraw(Drawable* element)
+{
+    //toBeDrawnSemaphore->p();
+    toBeDrawn.erase(std::remove(toBeDrawn.begin(), toBeDrawn.end(), element), toBeDrawn.end());
+    //toBeDrawnSemaphore->v();
+}
 
 void Window::run()
 {

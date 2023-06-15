@@ -7,7 +7,7 @@
 
 __BEGIN_API
 
-int Enemy::ENEMY_SIZE = 24;
+int Enemy::ENEMY_SIZE = 48;
 int Enemy::ENEMY_SPEED = 25;
 float Enemy::SHOT_COOLDOWN = 1000;
 float Enemy::DIAGONAL_TIME = 1000;
@@ -97,7 +97,7 @@ void Enemy::run()
     }
 }
 
-void Enemy::processDirectionAlgorithm()
+inline void Enemy::processDirectionAlgorithm()
 {
     Shot::Direction directionToGo;
 
@@ -155,7 +155,6 @@ void Enemy::processDirectionAlgorithm()
     this->shoot();
 }
 
-
 void Enemy::shoot()
 {
     if (this->shotClock->getElapsedTime() > SHOT_COOLDOWN)
@@ -167,23 +166,18 @@ void Enemy::shoot()
         switch (shotDirection)
         {
             case Shot::Direction::UP:
-                shotPosition.x += 7;
-                shotPosition.y -= 25;
+                shotPosition.y -= 40;
                 break;
             case Shot::Direction::DOWN:
-                shotPosition.x += 7;
                 shotPosition.y += 40;
                 break;
             case Shot::Direction::LEFT:
-                shotPosition.x -= 25;
-                shotPosition.y += 7;
+                shotPosition.x -= 40;
                 break;
             case Shot::Direction::RIGHT:
                 shotPosition.x += 40;
-                shotPosition.y += 7;
                 break;
         }
-
         Shot* shot = new Shot(shotPosition, shotDirection, false);
     }
 }
@@ -207,10 +201,10 @@ void Enemy::draw(sf::RenderWindow &window, double diffTime)
 
 void Enemy::collide(int damage)
 {
-    Enemy::isDeadSemaphore->p();
+    //Enemy::isDeadSemaphore->p();
     this->reliveClock->restart();
     this->_isDead = true;
-    Enemy::isDeadSemaphore->v();
+    //Enemy::isDeadSemaphore->v();
 }
 
 void Enemy::update(double diffTime)
@@ -349,15 +343,18 @@ void Enemy::directionAlgorithmC()
         switch (randomNum) {
             case 0:
                 this->direction = Shot::LEFT;
+                break;
             case 1:
                 this->direction = Shot::RIGHT;
+                break;
             case 2:
                 this->direction = Shot::UP;
+                break;
             case 3:
                 this->direction = Shot::DOWN;
+                break;
         }
     }
-    this->direction;
 }
 
 void Enemy::directionAlgorithmD()
@@ -555,16 +552,16 @@ Point Enemy::getCenter()
 
 void Enemy::handleOutOfBounds()
 {
-    float leftBound = this->position.x - ENEMY_SIZE*1.5;
-    float rightBound = this->position.x + ENEMY_SIZE*2.5;
+    float leftBound = this->position.x - ENEMY_SIZE*0.75;
+    float rightBound = this->position.x + ENEMY_SIZE*1.25;
 
     if (rightBound > Config::playableAreaWidth)
         this->position.x -= rightBound - Config::playableAreaWidth;
     else if (leftBound < 0)
         this->position.x -= leftBound;
 
-    float topBound = this->position.y - ENEMY_SIZE*1.5;
-    float bottomBound = this->position.y + ENEMY_SIZE*3;
+    float topBound = this->position.y - ENEMY_SIZE*0.75;
+    float bottomBound = this->position.y + ENEMY_SIZE*1.5;
 
     if (bottomBound > Config::playableAreaHeight)
         this->position.y -= bottomBound - Config::playableAreaHeight;

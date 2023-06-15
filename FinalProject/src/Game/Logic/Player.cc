@@ -10,7 +10,7 @@
 __BEGIN_API
 
 int Player::HALF_PLAYER_SIZE = 24;
-int Player::PLAYER_SIZE = 24;
+int Player::PLAYER_SIZE = 48;
 int Player::PLAYER_SPEED = 250;
 float Player::SHOT_COOLDOWN = 200;
 float Player::INVULNERABILITY_TIME = 3.0;
@@ -174,7 +174,7 @@ bool Player::isDead()
     return this->life <= 0; // CHECK
 }
 
-void Player::processKeyboardInput() {
+inline void Player::processKeyboardInput() {
     //KeyboardHandler::eventQueueSemaphore->p();
     KeyboardHandler::keys eventToProcess = this->keyboardHandler->getNextKey();
 
@@ -222,20 +222,16 @@ void Player::shoot(Shot::Direction directionToShoot)
         switch (shotDirection)
         {
             case Shot::Direction::UP:
-                shotPosition.x += 7;
-                shotPosition.y -= 25;
+                shotPosition.y -= 40;
                 break;
             case Shot::Direction::DOWN:
-                shotPosition.x += 7;
                 shotPosition.y += 40;
                 break;
             case Shot::Direction::LEFT:
-                shotPosition.x -= 25;
-                shotPosition.y += 7;
+                shotPosition.x -= 40;
                 break;
             case Shot::Direction::RIGHT:
                 shotPosition.x += 40;
-                shotPosition.y += 7;
                 break;
         }
 
@@ -271,16 +267,16 @@ void Player::removeFromGame()
 
 void Player::handleOutOfBounds()
 {
-    float leftBound = this->position.x - PLAYER_SIZE*1.5;
-    float rightBound = this->position.x + PLAYER_SIZE*2.5;
+    float leftBound = this->position.x - PLAYER_SIZE*0.75;
+    float rightBound = this->position.x + PLAYER_SIZE*1.25;
 
     if (rightBound > Config::playableAreaWidth)
         this->position.x -= rightBound - Config::playableAreaWidth;
     else if (leftBound < 0)
         this->position.x -= leftBound;
 
-    float topBound = this->position.y - PLAYER_SIZE*1.5;
-    float bottomBound = this->position.y + PLAYER_SIZE*3;
+    float topBound = this->position.y - PLAYER_SIZE*0.75;
+    float bottomBound = this->position.y + PLAYER_SIZE*1.5;
 
     if (bottomBound > Config::playableAreaHeight)
         this->position.y -= bottomBound - Config::playableAreaHeight;
