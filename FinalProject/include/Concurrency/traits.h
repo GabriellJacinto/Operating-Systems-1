@@ -28,7 +28,7 @@ template<typename T> struct Traits {
 };
 
 template<> struct Traits<CPU> {
-    static const int STACK_SIZE = 256*1024;
+    static const int STACK_SIZE = 300*1024;
     static const bool debugged = false;
 };
 

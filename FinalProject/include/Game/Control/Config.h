@@ -3,7 +3,8 @@
 
 #include "Concurrency/traits.h"
 #include <iostream>
-#include "Concurrency/semaphore.h"
+#include "Concurrency/semaphore.h"    static int enemiesPerLevel;
+
 #include <ucontext.h>
 
 __BEGIN_API
@@ -19,15 +20,15 @@ public:
     static int playableAreaWidth;
     static int playableAreaHeight;
     static int infoAreaWidth;
-    static int infoAreaHeight;
     static int fps;
     static int lives;
     static bool finished;
     static bool paused;
     static bool gameOver;
     static int enemiesPerLevel;
-    static bool bossExists;
+    static int maxLevel;
     static void deleteSemaphores();
+    static int infoAreaHeight;
 };
 
 __END_API

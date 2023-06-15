@@ -25,7 +25,8 @@ public:
     {
         A,
         B,
-        C
+        C,
+        D
     };
 
     Enemy(Algorithm algorithm, Player* player, Point position);
@@ -37,10 +38,9 @@ public:
     void collide(int damage) override;
     bool isDead() override {return _isDead;}
     void update(double diffTime) override;
-    bool isOutOfPlay();
     int getSize() override;
     Point getPosition() override;
-    void setInitialPosition(const Point& position);
+    Point getCenter();
     void setPosition(const Point& position);
     Point getPreviousPosition();
 
@@ -48,21 +48,19 @@ public:
     static Semaphore* moveSemaphore;
 
     int damageGiven = 1;
-
-    static bool avoidCollision(Enemy* enemy1, Enemy* enemy2);
-
+    bool isStuck = false;
     static int ENEMY_SPEED;
-
     void inverseDirection();
-
-    bool avoidingCollision = false;
+    Shot::Direction inverseDirection(Shot::Direction dir);
+    void setDirection(Shot::Direction direction);
     static int ENEMY_SIZE;
-
     void insertInGame();
-
+    void setEnemiesToAvoid(Enemy* enemy1, Enemy* enemy2, Enemy* enemy3);
+    sf::FloatRect getGlobalBounds() override;
     Point previousPosition;
+    static std::unique_ptr<Clock> avoidCollisionClock;
+
 private:
-    static int HALF_ENEMY_SIZE;
     static float SHOT_COOLDOWN;
     static float RELIVE_TIME;
     static float DIAGONAL_TIME;
@@ -70,27 +68,34 @@ private:
     static int MINIMUM_DISTANCE;
     static int TARGET_DISTANCE;
     static float RANDOM_MOVE_TIME;
+    static float HIT_ANIMATION_TIME;
 
     std::unique_ptr<Clock> shotClock;
     std::unique_ptr<Clock> reliveClock;
     std::unique_ptr<Clock> diagonalClock;
     std::unique_ptr<Clock> randomMoveClock;
+    std::unique_ptr<Clock> drawDamagedEnemyClock;
+
+    Enemy* enemyToAvoid1 = nullptr;
+    Enemy* enemyToAvoid2 = nullptr;
+    Enemy* enemyToAvoid3 = nullptr;
 
     Player* player;
     bool _isDead = false;
-    Enemy* previousEnemyCollided = nullptr;
+    bool avoidingCollision = false;
     Algorithm algorithm;
 
     void processDirectionAlgorithm();
-    Shot::Direction directionAlgorithmA();
-    Shot::Direction directionAlgorithmB();
+    void directionAlgorithmA();
+    void directionAlgorithmB();
+    void directionAlgorithmC();
+    void directionAlgorithmD();
+
+    Shot::Direction getBestDirectionToAvoidEnemies();
     void move(double diffTime);
     void handleOutOfBounds();
     void updateSprite();
     void shoot();
-    Shot::Direction getRandomDirection();
-
-    void removeFromGame();
 
     void loadAndBindTexture();
 
@@ -99,6 +104,19 @@ private:
     Vector speed;
     Point position;
     Shot::Direction direction;
+
+    template<typename T>
+    static bool isValueInVector(const std::vector<T>& vec, const T& value)
+    {
+        for (const auto& element : vec)
+        {
+            if (element == value)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 };
 
 __END_API

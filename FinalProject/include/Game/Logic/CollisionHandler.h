@@ -42,12 +42,10 @@ private:
     static Player* player;
     static vector<Shot*> shots;
     static vector<Shot*> shotsToRemove;
-    static float ENEMY_COLLISION_TIME;
     unique_ptr<Clock> enemyCollisionClock;
 
     void handleCollisions();
     void handlePlayerEnemyCollisions();
-    void handleEnemyCollisions();
     void handleShotCollisions();
     bool hasCollided(Drawable* drawable1, Drawable* drawable2);
 

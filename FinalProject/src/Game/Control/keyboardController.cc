@@ -42,12 +42,12 @@ void KeyboardHandler::run()
         else if (key.actionKey == Play::KeyPress::PAUSE)
         {
             //Config::pausedSemaphore->p();
-            Config::paused = !Config::paused;
             //Config::pausedSemaphore->v();
             //saveEventsSemaphore->p();
             saveEvents = !saveEvents;
             //saveEventsSemaphore->v();
-            BrickShooter::pause();
+            //BrickShooter::pause();
+            Config::paused = !Config::paused;
             window->pause();
         }
         else if (key.actionKey == Play::KeyPress::RESTART)

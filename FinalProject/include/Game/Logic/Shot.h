@@ -31,7 +31,7 @@ public:
     void draw(sf::RenderWindow &window, double diffTime) override;
     void update(double diffTime) override;
     void updateSprite();
-
+    sf::FloatRect getGlobalBounds() override;
     int getSize() override;
 
     int getDamage() const { return this->damage; }

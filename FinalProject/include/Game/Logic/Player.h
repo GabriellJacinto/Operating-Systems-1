@@ -44,6 +44,7 @@ public:
     static Semaphore* invulnerabilitySemaphore;
     static Semaphore* moveSemaphore;
 
+    sf::FloatRect getGlobalBounds() override;
     void removeFromGame();
 
 private:

@@ -130,7 +130,6 @@ void Window::run()
     this->clock = sf::Clock();
     while (window->isOpen())
     {
-        cout << "Window running" << endl;
         float currentTime = clock.getElapsedTime().asSeconds();
         double diffTime = currentTime - this->lastTime;
         this->lastTime = currentTime;

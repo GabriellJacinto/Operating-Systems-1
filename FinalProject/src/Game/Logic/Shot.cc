@@ -46,6 +46,8 @@ void Shot::loadAndBindTexture()
     texture.loadFromFile("assets/sprites/space_ships/shot.png");
     sprite.setTexture(texture);
     sprite.scale(-0.5, -0.5);
+    sf::Vector2u textureSize = texture.getSize();
+    sprite.setOrigin(textureSize.x / 2, textureSize.y / 2);
 }
 
 void Shot::draw(sf::RenderWindow &window, double diffTime)
@@ -106,6 +108,11 @@ Point Shot::getPosition()
 void Shot::collide()
 {
     this->removeFromGame();
+}
+
+sf::FloatRect Shot::getGlobalBounds()
+{
+    return this->sprite.getGlobalBounds();
 }
 
 __END_API

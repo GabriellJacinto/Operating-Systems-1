@@ -10,11 +10,11 @@
 __BEGIN_API
 
 int Player::HALF_PLAYER_SIZE = 24;
-int Player::PLAYER_SIZE = 20;
+int Player::PLAYER_SIZE = 24;
 int Player::PLAYER_SPEED = 250;
 float Player::SHOT_COOLDOWN = 500;
 float Player::INVULNERABILITY_TIME = 3.0;
-float Player::HIT_ANIMATION_TIME = 150;
+float Player::HIT_ANIMATION_TIME = 20;
 Semaphore* Player::lifeSemaphore = new Semaphore();
 Semaphore* Player::invulnerabilitySemaphore = new Semaphore();
 Semaphore* Player::moveSemaphore = new Semaphore();
@@ -67,7 +67,7 @@ void Player::run()
 {
     while (!Config::finished)
     {
-        if (!Config::gameOver)
+        if (!Config::gameOver && !Config::paused)
         {
             this->processKeyboardInput();
         }
@@ -270,14 +270,21 @@ void Player::removeFromGame()
 
 void Player::handleOutOfBounds()
 {
-    if (this->position.x > Config::playableAreaWidth - PLAYER_SIZE)
-        this->position.x = Config::playableAreaWidth - PLAYER_SIZE;
-    else if (this->position.x < PLAYER_SIZE)
-        this->position.x = PLAYER_SIZE;
-    if (this->position.y > Config::playableAreaHeight - PLAYER_SIZE)
-        this->position.y = Config::playableAreaHeight - PLAYER_SIZE;
-    else if (this->position.y < PLAYER_SIZE)
-        this->position.y = PLAYER_SIZE;
+    float leftBound = this->position.x - PLAYER_SIZE*1.5;
+    float rightBound = this->position.x + PLAYER_SIZE*2.5;
+
+    if (rightBound > Config::playableAreaWidth)
+        this->position.x -= rightBound - Config::playableAreaWidth;
+    else if (leftBound < 0)
+        this->position.x -= leftBound;
+
+    float topBound = this->position.y - PLAYER_SIZE*1.5;
+    float bottomBound = this->position.y + PLAYER_SIZE*3;
+
+    if (bottomBound > Config::playableAreaHeight)
+        this->position.y -= bottomBound - Config::playableAreaHeight;
+    else if (topBound < 0)
+        this->position.y -= topBound;
 }
 
 void Player::setInitialPosition(Point initialPosition)
@@ -294,6 +301,11 @@ Point Player::getPreviousPosition()
 void Player::setPosition(const Point &newPosition)
 {
     this->position = newPosition;
+}
+
+sf::FloatRect Player::getGlobalBounds()
+{
+    return this->sprite.getGlobalBounds();
 }
 
 __END_API

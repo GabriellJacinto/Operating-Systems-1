@@ -46,6 +46,7 @@ void BrickShooter::play(void * name)
     playerThread->join();
     keyboardHandlerThread->join();
     // Delete game objects and threads
+    Config::deleteSemaphores();
     delete window;
     delete player;
     delete keyboardHandler;
@@ -62,7 +63,6 @@ void BrickShooter::play(void * name)
     {
         delete enemy;
     }
-    cout << "Game over" << endl;
 }
 
 void BrickShooter::playerThreadFunction()
@@ -105,16 +105,21 @@ void BrickShooter::init()
     window = new Window();
     keyboardHandler = new KeyboardHandler(window);
     player = new Player(keyboardHandler);
-    enemies.push_back(new Enemy(Enemy::Algorithm::A, player, Point(100, 100)));
+    enemies.push_back(new Enemy(Enemy::Algorithm::C, player, Point(100, 100)));
     enemies.push_back(new Enemy(Enemy::Algorithm::A, player, Point(100, Config::playableAreaHeight - 100 - 2*Enemy::ENEMY_SIZE)));
-    enemies.push_back(new Enemy(Enemy::Algorithm::B, player, Point(Config::playableAreaWidth - 100 - Enemy::ENEMY_SIZE, 100)));
+    enemies.push_back(new Enemy(Enemy::Algorithm::D, player, Point(Config::playableAreaWidth - 100 - Enemy::ENEMY_SIZE, 100)));
     enemies.push_back(new Enemy(Enemy::Algorithm::B, player, Point(Config::playableAreaWidth - 100 - Enemy::ENEMY_SIZE, Config::playableAreaHeight - 100 - 2*Enemy::ENEMY_SIZE)));
+
+    enemies[0]->setEnemiesToAvoid(enemies[1], enemies[2], enemies[3]);
+    enemies[1]->setEnemiesToAvoid(enemies[0], enemies[2], enemies[3]);
+    enemies[2]->setEnemiesToAvoid(enemies[0], enemies[1], enemies[3]);
+    enemies[3]->setEnemiesToAvoid(enemies[0], enemies[1], enemies[2]);
 }
 
 bool BrickShooter::shouldLevelUp()
 {
     killedEnemies++;
-    return killedEnemies == Config::enemiesPerLevel;
+    return (killedEnemies == Config::enemiesPerLevel && info->level+1 <= Config::maxLevel);
 }
 
 void BrickShooter::increaseScore()
@@ -128,7 +133,7 @@ void BrickShooter::increaseLevel(const vector<Enemy*>& enemiesToIncrease)
         Info::increaseLevel(*info);
         killedEnemies = 0;
         for (auto enemy: enemiesToIncrease) {
-            Enemy::ENEMY_SPEED += 25;
+            Enemy::ENEMY_SPEED += 15;
         }
     }
 }
@@ -161,15 +166,13 @@ void BrickShooter::restart()
     for (auto enemy : enemies)
         enemy->insertInGame();
 
-    cout << "Restarted" << endl;
     collisionHandler->restart();
     for (auto enemy : enemies)
         CollisionHandler::addEnemy(enemy);
     CollisionHandler::addPlayer(player);
 
 
-    Enemy::ENEMY_SPEED = 100;
-    cout << "Restarted" << endl;
+    Enemy::ENEMY_SPEED = 50;
 }
 
 void BrickShooter::pause()

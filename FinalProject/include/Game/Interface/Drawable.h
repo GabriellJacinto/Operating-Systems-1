@@ -16,6 +16,7 @@ public:
     virtual void update(double diffTime) = 0;
     virtual int getSize() = 0;
     virtual Point getPosition() = 0;
+    virtual sf::FloatRect getGlobalBounds() = 0;
 };
 
 __END_API

@@ -16,6 +16,7 @@ int Config::playableAreaWidth = 600; // CHECK THE VALUES
 int Config::infoAreaHeight = 560;
 int Config::infoAreaWidth = 569;
 int Config::enemiesPerLevel = 4;
+int Config::maxLevel = 3;
 int Config::lives = 3;
 bool Config::finished = false;
 bool Config::paused = false;

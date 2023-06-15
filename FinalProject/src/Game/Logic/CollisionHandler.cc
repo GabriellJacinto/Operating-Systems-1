@@ -15,7 +15,6 @@ Player* CollisionHandler::player;
 vector<Enemy*> CollisionHandler::enemies;
 vector<Shot*> CollisionHandler::shots;
 vector <Shot*> CollisionHandler::shotsToRemove;
-float CollisionHandler::ENEMY_COLLISION_TIME = 500;
 
 CollisionHandler::CollisionHandler()
 {
@@ -43,20 +42,18 @@ void CollisionHandler::run()
 {
     while(!Config::finished)
     {
-        cout << "CollisionHafndler" << endl;
-        if (!Config::paused && !Config::gameOver)
+        if (!Config::gameOver && !Config::paused)
         {
             this->handleCollisions();
         }
-        cout << "CollisiofffffffffnHandler" << endl;
-        Thread::yield();
-    }
         for (auto it = shotsToRemove.begin(); it != shotsToRemove.end();)
         {
             auto shot = *it;
             it = shotsToRemove.erase(it);
             delete shot;
         }
+        Thread::yield();
+    }
 }
 
 void CollisionHandler::handleCollisions()
@@ -64,7 +61,6 @@ void CollisionHandler::handleCollisions()
     if (player == nullptr)
         return;
     this->handlePlayerEnemyCollisions();
-    this->handleEnemyCollisions();
     this->handleShotCollisions();
 }
 
@@ -83,7 +79,9 @@ void CollisionHandler::handlePlayerEnemyCollisions()
 
             Point enemyPos = enemy->getPreviousPosition();
             enemy->setPosition(enemyPos);
-            player->collide(enemy->damageGiven);
+
+            if (!enemy->isDead())
+                player->collide(enemy->damageGiven);
 
             if (player == nullptr)
                 break;
@@ -94,29 +92,15 @@ void CollisionHandler::handlePlayerEnemyCollisions()
     //playerSemaphore->v();
 }
 
-void CollisionHandler::handleEnemyCollisions()
-{
-    if (enemies.size() < 2 )
-        return;
-    for (int i = 0; i < enemies.size(); i++)
-    {
-        for (int j = i + 1; j < enemies.size(); j++)
-        {
-            bool avoid = Enemy::avoidCollision(enemies[i], enemies[j]);
-            if (avoid) return;
-        }
-    }
-}
-
 void CollisionHandler::handleShotCollisions()
 {
     if (shots.size() < 2)
         return;
-    for (int i = 0; i < enemies.size()-1; i++)
+    for (int i = 0; i < shots.size()-1; i++)
     {
-        for (int j = i + 1; j < enemies.size()-1; j++)
+        for (int j = i + 1; j < shots.size()-1; j++)
         {
-            if ((shots[i]->getIsPlayerShot() && shots[j]->getIsPlayerShot()) ||
+            if ((shots[i]->getIsPlayerShot() && !shots[j]->getIsPlayerShot()) ||
                 (!shots[i]->getIsPlayerShot() && !shots[j]->getIsPlayerShot()))
             {
                 if (this->hasCollided(shots[i], shots[j]))
@@ -138,11 +122,13 @@ void CollisionHandler::handleShotCollisions()
                 if (this->hasCollided(shot, enemy))
                 {
                     shot->removeFromGame();
-                    enemy->collide(shot->getDamage());
-                    BrickShooter::increaseScore();
-                    if (BrickShooter::shouldLevelUp())
+                    if (!enemy->isDead())
                     {
-                        BrickShooter::increaseLevel(enemies);
+                        enemy->collide(shot->getDamage());
+                        BrickShooter::increaseScore();
+                        if (BrickShooter::shouldLevelUp()) {
+                            BrickShooter::increaseLevel(enemies);
+                        }
                     }
                 }
             }
@@ -156,19 +142,26 @@ void CollisionHandler::handleShotCollisions()
                 shot->removeFromGame();
                 player->collide(shot->getDamage());
             }
+            if (enemies.empty())
+                break;
+            for (auto enemy : enemies)
+            {
+                if (this->hasCollided(shot, enemy))
+                {
+                    shot->removeFromGame();
+                }
+            }
         }
     }
 }
 
 bool CollisionHandler::hasCollided(Drawable *drawable1, Drawable *drawable2)
 {
-    int firstSize = drawable1->getSize();
-    Point firstPos = drawable1->getPosition();
-    Point secondPos = drawable2->getPosition();
-    int secondSize = drawable2->getSize();
+    sf::FloatRect firstBounds = drawable1->getGlobalBounds();
+    sf::FloatRect secondBounds = drawable2->getGlobalBounds();
 
-    return (abs(firstPos.x - secondPos.x) < (firstSize + secondSize) &&
-            abs(firstPos.y - secondPos.y) < (firstSize + secondSize));
+    bool isColliding = firstBounds.intersects(secondBounds);
+    return isColliding;
 }
 
 void CollisionHandler::addEnemy(Enemy* enemy)
