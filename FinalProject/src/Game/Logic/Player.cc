@@ -12,7 +12,7 @@ __BEGIN_API
 int Player::HALF_PLAYER_SIZE = 24;
 int Player::PLAYER_SIZE = 24;
 int Player::PLAYER_SPEED = 250;
-float Player::SHOT_COOLDOWN = 500;
+float Player::SHOT_COOLDOWN = 200;
 float Player::INVULNERABILITY_TIME = 3.0;
 float Player::HIT_ANIMATION_TIME = 20;
 Semaphore* Player::lifeSemaphore = new Semaphore();
@@ -51,6 +51,7 @@ void Player::insertInGame()
     //CollisionHandler::playerSemaphore->v();
     this->keyboardHandler->saveEvents = true;
     this->position = Point((float)Config::playableAreaWidth / 2, (float)Config::playableAreaHeight / 2);
+    this->updateSprite();
     this->invulnerable = false;
 }
 

@@ -8,8 +8,8 @@
 __BEGIN_API
 
 int Enemy::ENEMY_SIZE = 24;
-int Enemy::ENEMY_SPEED = 50;
-float Enemy::SHOT_COOLDOWN = 500;
+int Enemy::ENEMY_SPEED = 25;
+float Enemy::SHOT_COOLDOWN = 1000;
 float Enemy::DIAGONAL_TIME = 1000;
 float Enemy::RELIVE_TIME = 2000;
 Semaphore* Enemy::isDeadSemaphore = new Semaphore();
@@ -207,11 +207,10 @@ void Enemy::draw(sf::RenderWindow &window, double diffTime)
 
 void Enemy::collide(int damage)
 {
-    //Enemy::isDeadSemaphore->p();
+    Enemy::isDeadSemaphore->p();
     this->reliveClock->restart();
     this->_isDead = true;
-    //Enemy::isDeadSemaphore->v();
-    //this->removeFromGame();
+    Enemy::isDeadSemaphore->v();
 }
 
 void Enemy::update(double diffTime)
@@ -556,14 +555,21 @@ Point Enemy::getCenter()
 
 void Enemy::handleOutOfBounds()
 {
-    if (this->position.x > Config::playableAreaWidth - ENEMY_SIZE)
-        this->position.x = Config::playableAreaWidth - ENEMY_SIZE;
-    else if (this->position.x < ENEMY_SIZE)
-        this->position.x = ENEMY_SIZE;
-    if (this->position.y > Config::playableAreaHeight - ENEMY_SIZE)
-        this->position.y = Config::playableAreaHeight - ENEMY_SIZE;
-    else if (this->position.y < ENEMY_SIZE)
-        this->position.y = ENEMY_SIZE;
+    float leftBound = this->position.x - ENEMY_SIZE*1.5;
+    float rightBound = this->position.x + ENEMY_SIZE*2.5;
+
+    if (rightBound > Config::playableAreaWidth)
+        this->position.x -= rightBound - Config::playableAreaWidth;
+    else if (leftBound < 0)
+        this->position.x -= leftBound;
+
+    float topBound = this->position.y - ENEMY_SIZE*1.5;
+    float bottomBound = this->position.y + ENEMY_SIZE*3;
+
+    if (bottomBound > Config::playableAreaHeight)
+        this->position.y -= bottomBound - Config::playableAreaHeight;
+    else if (topBound < 0)
+        this->position.y -= topBound;
 }
 
 Point Enemy::getPreviousPosition()

@@ -132,9 +132,8 @@ void BrickShooter::increaseLevel(const vector<Enemy*>& enemiesToIncrease)
     {
         Info::increaseLevel(*info);
         killedEnemies = 0;
-        for (auto enemy: enemiesToIncrease) {
-            Enemy::ENEMY_SPEED += 15;
-        }
+        Enemy::ENEMY_SPEED += 50;
+
     }
 }
 
@@ -150,9 +149,9 @@ void BrickShooter::restart()
     player->removeFromGame();
     player->insertInGame();
 
-    //Config::gameOverSemaphore->p();
+    Config::gameOverSemaphore->p();
     Config::gameOver = false;
-    //Config::gameOverSemaphore->v();
+    Config::gameOverSemaphore->v();
 
     enemies[0]->setPosition(Point(100, 100));
     enemies[0]->previousPosition= Point(100, 100);
@@ -171,8 +170,7 @@ void BrickShooter::restart()
         CollisionHandler::addEnemy(enemy);
     CollisionHandler::addPlayer(player);
 
-
-    Enemy::ENEMY_SPEED = 50;
+    Enemy::ENEMY_SPEED = 25;
 }
 
 void BrickShooter::pause()
