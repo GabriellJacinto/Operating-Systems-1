@@ -6,6 +6,7 @@
 #include "Game/Interface/window.h"
 #include "Game/Logic/Shot.h"
 #include "Game/Control/BrickShooter.h"
+#include "Game/Interface/Sounds.h"
 
 __BEGIN_API
 
@@ -156,12 +157,15 @@ void Player::collide(int damage)
     this->invulnerable = true;
     this->invulnerabilityTime = INVULNERABILITY_TIME;
     this->drawDamagedPlayerClock->restart();
+    Sounds::playHitSound();
 
     if (this->isDead())
     {
         Config::gameOver = true;
+        Sounds::playGameOverSound();
         this->removeFromGame();
     }
+
 }
 
 bool Player::isOutOfPlay()

@@ -1,5 +1,7 @@
 #include "Game/Control/BrickShooter.h"
 #include "Concurrency/traits.h"
+#include "SFML/Audio.hpp"
+#include "Game/Interface/Sounds.h"
 
 __BEGIN_API
 
@@ -99,6 +101,7 @@ void BrickShooter::windowThreadFunction()
 
 void BrickShooter::init()
 {
+    Sounds::loadSounds();
     info = new Info::Info();
     info->lives = 3;
     info->score = 0;
@@ -135,7 +138,7 @@ void BrickShooter::increaseLevel(const vector<Enemy*>& enemiesToIncrease)
         Info::increaseLevel(*info);
         killedEnemies = 0;
         Enemy::ENEMY_SPEED += 50;
-
+        Sounds::playLevelUpSound();
     }
 }
 
@@ -171,6 +174,8 @@ void BrickShooter::restart()
     CollisionHandler::addPlayer(player);
 
     Enemy::ENEMY_SPEED = 25;
+
+    Sounds::playRestartSound();
 }
 
 void BrickShooter::pause()

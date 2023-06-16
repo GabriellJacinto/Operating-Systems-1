@@ -8,6 +8,6 @@ SRC := $(TOP)/src
 OBJDIR := $(TOP)/objects
 
 # Flags
-LIBS = -lsfml-graphics -lsfml-window -lsfml-system -lm -lpng -g
+LIBS = -lsfml-graphics -lsfml-window -lsfml-system -lm -lpng -g -lsfml-audio
 
 CC_FLAGS := -c -w -Wall -Wextra -ansi -pedantic -g -I$(HEADERS) -std=c++14

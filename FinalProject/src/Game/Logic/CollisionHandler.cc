@@ -110,20 +110,17 @@ inline void CollisionHandler::handleShotCollisions()
 
 inline void CollisionHandler::handleShotShotCollisions()
 {
-    if (shots.size() < 2)
+    int shotsInGame = shots.size();
+    if (shotsInGame < 2)
         return;
-    for (int i = 0; i < shots.size()-1; i++)
+    for (int i = 0; i < shots.size(); i++)
     {
-        for (int j = i + 1; j < shots.size()-1; j++)
+        for (int j = i + 1; j < shots.size(); j++)
         {
-            if ((shots[i]->getIsPlayerShot() && !shots[j]->getIsPlayerShot()) ||
-                (!shots[i]->getIsPlayerShot() && !shots[j]->getIsPlayerShot()))
+            if (this->hasCollided(shots[i], shots[j]))
             {
-                if (this->hasCollided(shots[i], shots[j]))
-                {
-                    shots[i]->collide();
-                    shots[j]->collide();
-                }
+                shots[i]->collide();
+                shots[j]->collide();
             }
         }
     }

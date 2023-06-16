@@ -2,6 +2,7 @@
 #include "Concurrency/traits.h"
 #include "Game/Logic/CollisionHandler.h"
 #include "Game/Logic/Player.h"
+#include "Game/Interface/Sounds.h"
 
 __BEGIN_API
 
@@ -18,6 +19,7 @@ Shot::Shot(const Point &position, Shot::Direction direction,bool isPlayerShot)
     CollisionHandler::addShot(this);
     //CollisionHandler::shotsSemaphore->v();
     loadAndBindTexture();
+    Sounds::playShotSound();
 }
 
 Vector Shot::getSpeed(Shot::Direction directionOfShot)

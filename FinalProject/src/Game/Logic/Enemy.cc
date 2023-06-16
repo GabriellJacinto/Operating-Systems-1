@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <random>
+#include "Game/Interface/Sounds.h"
 
 __BEGIN_API
 
@@ -205,6 +206,7 @@ void Enemy::collide(int damage)
     this->reliveClock->restart();
     this->_isDead = true;
     //Enemy::isDeadSemaphore->v();
+    Sounds::playHitSound();
 }
 
 void Enemy::update(double diffTime)

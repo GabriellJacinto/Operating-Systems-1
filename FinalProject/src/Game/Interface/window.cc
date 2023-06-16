@@ -7,6 +7,7 @@
 #include "Concurrency/thread.h"
 #include "Game/Logic/Info.h"
 #include "Game/Control/BrickShooter.h"
+#include "Game/Interface/Sounds.h"
 
 __BEGIN_API
 
@@ -128,6 +129,7 @@ void Window::run()
     window->setKeyRepeatEnabled(true);
     window->setFramerateLimit(Config::fps);
     this->clock = sf::Clock();
+    Sounds::playBackgroundMusic();
     while (window->isOpen())
     {
         float currentTime = clock.getElapsedTime().asSeconds();

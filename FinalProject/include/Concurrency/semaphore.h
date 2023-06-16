@@ -1,10 +1,11 @@
 #ifndef semaphore_h
 #define semaphore_h
 
-#include "cpu.h"
-#include "thread.h"
-#include "traits.h"
-#include "debug.h"
+#include "Concurrency/cpu.h"
+#include "Concurrency/thread.h"
+#include "Concurrency/traits.h"
+#include "Concurrency/debug.h"
+#include "Concurrency/list.h"
 
 __BEGIN_API
 
@@ -26,7 +27,7 @@ private:
 
     // Thread operations
     void sleep();
-    void wakeup();
+    void wakeup(bool reschedule = true);
     void wakeup_all();
 
 private:
