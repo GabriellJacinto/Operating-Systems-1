@@ -86,7 +86,7 @@ void Enemy::run()
         //Enemy::isDeadSemaphore->p();
         if (!Config::gameOver && !Config::paused)
         {
-            if (!this->_isDead) {
+            if (!this->_isDead || !this->collidedWithPlayer) {
                 this->processDirectionAlgorithm();
             } else {
                 if (this->reliveClock->getElapsedTime() > RELIVE_TIME) {
@@ -442,7 +442,6 @@ Shot::Direction Enemy::getBestDirectionToAvoidEnemies()
     if (distances[minIndex] < MINIMUM_DISTANCE)
     {
         Point currentPosition = this->getPosition();
-
 
         this->avoidingCollision = true;
         Shot::Direction closestEnemyDirection = closestEnemy->direction;

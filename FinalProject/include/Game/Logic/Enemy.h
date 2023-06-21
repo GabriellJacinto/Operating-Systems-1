@@ -47,6 +47,7 @@ public:
     static Semaphore* isDeadSemaphore;
     static Semaphore* moveSemaphore;
 
+    bool collidedWithPlayer = false;
     int damageGiven = 1;
     bool isStuck = false;
     static int ENEMY_SPEED;
