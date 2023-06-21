@@ -207,10 +207,6 @@ void Thread::suspend()
 
 void Thread::sleep(Asleep_Queue* sleepQueue)
 {
-    if (!_sleepQueue)
-    {
-        _sleepQueue = sleepQueue;
-    }
     sleepQueue->push(this);
 
     db<Thread>(TRC) << "Thread::sleep() CHAMADO.\n";
@@ -256,19 +252,6 @@ void Thread::thread_exit(int exit_code)
 
 Thread::~Thread()
 {
-//    if (!_sleepQueue->empty())
-//    {
-//        cout << "Thread::~Thread() CHAMADO.\n";
-//        Asleep_Queue newQueue;
-//        while (!_sleepQueue->empty()) {
-//            Thread* element = _sleepQueue->front();
-//            _sleepQueue->pop();
-//            if (element != this) {
-//                newQueue.push(element);
-//            }
-//        }
-//        *_sleepQueue = newQueue;
-//    }
     _ready.remove(&this->_link); // Remove a thread da fila de prontos.
 
     if (this->_context) // Libera o contexto, caso ele exista.

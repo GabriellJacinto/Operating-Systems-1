@@ -136,7 +136,6 @@ __BEGIN_API
         void wakeup(bool reschedule = true); // Acorda a thread.
 
     private:
-        Asleep_Queue* _sleepQueue; // fila de threads que estão dormindo.
         int _id;
         Context * volatile _context;
         static Thread * _running;
