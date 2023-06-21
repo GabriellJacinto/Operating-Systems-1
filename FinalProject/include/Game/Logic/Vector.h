@@ -14,14 +14,10 @@
 
 __BEGIN_API
 
-/**
- * @struct Vector
- * @brief represents the change in position of x and y
- */
-
 class Point;
-struct Vector
+class Vector
 {
+public:
     double x;
     double y;
 
@@ -29,12 +25,6 @@ struct Vector
     Vector(double a, double b);
     ~Vector();
 
-    /**
-     *  @fn Vector operator * (double scalar);
-     *  @brief takes a scalar value and multiplies x and y by it
-     *  @param scalar
-     *  @return Vector
-     */
     Vector operator*(double scalar);
     Vector operator/(double scalar);
     Vector operator+(Vector v);
@@ -42,9 +32,7 @@ struct Vector
     void rollReallyRandom();
     int length();
 
-    // range [-200, 200]
     void rollRandomY();
-    // range [-200,-1]
     void rollRandomX();
     void reflectY();
     void reflectX();
