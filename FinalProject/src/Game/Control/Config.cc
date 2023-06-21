@@ -13,7 +13,6 @@ int Config::windowHeight = 560;
 int Config::windowWidth = 814;
 int Config::playableAreaHeight = 600; // CHECK THE VALUES
 int Config::playableAreaWidth = 600; // CHECK THE VALUES
-int Config::infoAreaHeight = 560;
 int Config::infoAreaWidth = 569;
 int Config::enemiesPerLevel = 4;
 int Config::maxLevel = 3;

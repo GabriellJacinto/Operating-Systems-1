@@ -21,6 +21,7 @@ public:
 
     static void play(void * name);
     static void init();
+    static void end();
 
     static void restart();
     static void pause();
@@ -29,7 +30,7 @@ public:
     static void increaseLevel(const vector<Enemy*>& enemies);
 
     static bool shouldLevelUp();
-    static Info::Info* info;
+    static Info* info;
 
 private:
 

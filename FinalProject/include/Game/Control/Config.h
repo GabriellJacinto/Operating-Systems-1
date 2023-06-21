@@ -28,7 +28,6 @@ public:
     static int enemiesPerLevel;
     static int maxLevel;
     static void deleteSemaphores();
-    static int infoAreaHeight;
 };
 
 __END_API

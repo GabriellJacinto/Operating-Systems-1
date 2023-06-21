@@ -79,7 +79,6 @@ inline void CollisionHandler::handlePlayerEnemyCollisions()
 
             Point enemyPos = enemy->getPreviousPosition();
             enemy->setPosition(enemyPos);
-            enemy->collidedWithPlayer = true;
 
             if (!enemy->isDead())
                 player->collide(enemy->damageGiven);
@@ -87,7 +86,6 @@ inline void CollisionHandler::handlePlayerEnemyCollisions()
             if (player == nullptr)
                 break;
         }
-        enemy->collidedWithPlayer = false;
     }
 
     //enemySemaphore->v();

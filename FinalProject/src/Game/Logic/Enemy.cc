@@ -86,11 +86,11 @@ void Enemy::run()
         //Enemy::isDeadSemaphore->p();
         if (!Config::gameOver && !Config::paused)
         {
-            if (!this->_isDead || !this->collidedWithPlayer) {
+            if (!this->_isDead) {
                 this->processDirectionAlgorithm();
             } else {
                 if (this->reliveClock->getElapsedTime() > RELIVE_TIME) {
-                    this->insertInGame();
+                    this->_isDead = false;
                 }
             }
         }

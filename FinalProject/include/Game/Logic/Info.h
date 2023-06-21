@@ -5,19 +5,22 @@
 
 __BEGIN_API
 
-namespace Info
+class Info
 {
-    struct Info
-    {
-        int score;
-        int lives;
-        int level;
-    };
+public:
+    Info();
+    ~Info() = default;
 
-    void incraseScore(Info& info);
-    void decreaseLives(Info& info);
-    void increaseLevel(Info& info);
-}
+    int score;
+    int lives;
+    int level;
+
+    void incraseScore();
+    void decreaseLives();
+    void increaseLevel();
+
+};
+
 __END_API
 
 #endif //INFO_H

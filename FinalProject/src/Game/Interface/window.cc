@@ -55,7 +55,8 @@ inline void Window::drawElements(double d)
 
 inline void Window::drawInfo()
 {
-    Info::Info* info = BrickShooter::info;
+    Info* info = BrickShooter::info;
+
     int score = info->score;
     int level = info->level;
     int lives = info->lives;

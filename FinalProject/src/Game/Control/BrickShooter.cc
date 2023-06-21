@@ -16,7 +16,7 @@ Thread* BrickShooter::collisionHandlerThread;
 Thread* BrickShooter::keyboardHandlerThread;
 Thread* BrickShooter::windowThread;
 vector<Thread*> BrickShooter::enemiesThreads;
-Info::Info* BrickShooter::info;
+Info* BrickShooter::info;
 #include "Game/Logic/Point.h"
 
 void BrickShooter::play(void * name)
@@ -67,6 +67,7 @@ void BrickShooter::play(void * name)
     {
         delete enemy;
     }
+    delete info;
 }
 
 void BrickShooter::playerThreadFunction()
@@ -102,10 +103,8 @@ void BrickShooter::windowThreadFunction()
 void BrickShooter::init()
 {
     Sounds::loadSounds();
-    info = new Info::Info();
-    info->lives = 3;
-    info->score = 0;
-    info->level = 1;
+    info = new Info();
+
     collisionHandler = new CollisionHandler();
     window = new Window();
     keyboardHandler = new KeyboardHandler(window);
@@ -129,22 +128,21 @@ bool BrickShooter::shouldLevelUp()
 
 void BrickShooter::increaseScore()
 {
-    Info::incraseScore(*info);
+    info->incraseScore();
 }
 
 void BrickShooter::increaseLevel(const vector<Enemy*>& enemiesToIncrease)
 {
     {
-        Info::increaseLevel(*info);
+        info->increaseLevel();
         killedEnemies = 0;
-        Enemy::ENEMY_SPEED += 50;
+        Enemy::ENEMY_SPEED += 25;
         Sounds::playLevelUpSound();
     }
 }
 
 void BrickShooter::restart()
 {
-
     killedEnemies = 0;
 
     info->lives = Config::lives;

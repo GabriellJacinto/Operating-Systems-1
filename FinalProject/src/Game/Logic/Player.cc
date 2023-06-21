@@ -46,7 +46,7 @@ void Player::insertInGame()
     this->life = 3;
     //Window::toBeDrawnSemaphore->p();
     Window::addElementToDraw(this);
-    //::toBeDrawnSemaphore->v();
+    //Window::toBeDrawnSemaphore->v();
     //CollisionHandler::playerSemaphore->p();
     CollisionHandler::addPlayer(this);
     //CollisionHandler::playerSemaphore->v();
@@ -152,7 +152,7 @@ void Player::collide(int damage)
         return;
 
     this->life -= damage;
-    Info::decreaseLives(*BrickShooter::info);
+    BrickShooter::info->decreaseLives();
 
     this->invulnerable = true;
     this->invulnerabilityTime = INVULNERABILITY_TIME;

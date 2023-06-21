@@ -209,7 +209,6 @@ void Thread::sleep(Asleep_Queue* sleepQueue)
 {
     if (!_sleepQueue)
     {
-        cout << "Thread::sleep() CHAMADO SEM FILA DE ESPERA.\n";
         _sleepQueue = sleepQueue;
     }
     sleepQueue->push(this);
@@ -270,7 +269,6 @@ Thread::~Thread()
 //        }
 //        *_sleepQueue = newQueue;
 //    }
-
     _ready.remove(&this->_link); // Remove a thread da fila de prontos.
 
     if (this->_context) // Libera o contexto, caso ele exista.

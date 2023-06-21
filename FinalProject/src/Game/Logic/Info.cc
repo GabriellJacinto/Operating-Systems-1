@@ -3,19 +3,26 @@
 
 __BEGIN_API
 
-void Info::incraseScore(Info& info)
+Info::Info()
 {
-    info.score += 100;
+    score = 0;
+    lives = 3;
+    level = 1;
 }
 
-void Info::decreaseLives(Info& info)
+void Info::incraseScore()
 {
-    info.lives--;
+    this->score += 100;
 }
 
-void Info::increaseLevel(Info &info)
+void Info::decreaseLives()
 {
-    info.level++;
+    this->lives--;
+}
+
+void Info::increaseLevel()
+{
+    this->level++;
 }
 
 __END_API
