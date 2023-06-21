@@ -39,7 +39,7 @@ void KeyboardHandler::run()
 
             window->quit();
         }
-        else if (key.actionKey == Play::KeyPress::PAUSE)
+        else if (key.actionKey == Play::KeyPress::PAUSE && !Config::gameOver)
         {
             //Config::pausedSemaphore->p();
             //Config::pausedSemaphore->v();
