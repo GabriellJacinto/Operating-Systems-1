@@ -24,7 +24,7 @@ __BEGIN_API
         friend class Semaphore;
 
         typedef Ordered_List<Thread> Ready_Queue;
-        typedef std::queue<Thread*> Asleep_Queue;
+        typedef Ordered_List<Thread> Asleep_Queue;
 
         // Thread State
         enum State {
@@ -144,6 +144,7 @@ __BEGIN_API
         static Thread _dispatcher;
         static Ready_Queue _ready;
         static Ready_Queue _suspended;
+        Asleep_Queue* _asleep = nullptr;
         Ready_Queue::Element _link;
         volatile State _state; // Como o estado da thread pode ser alterado por outra thread, é necessário que ele seja volátil.
         // Volatile garante que o compilador não otimize o código para esse estado.

@@ -15,7 +15,6 @@ void Semaphore::p()
     // dormir caso a mesma nao conseguir acessar o semaforo (ja existir em uso por outra Thread).
 
     db<Semaphore>(TRC) << "Semaphore::p called." << "\n";
-
     // PRECISA GARANTIR ATOMICIDADE.
     if(fdec(_value) < 1)
     {
@@ -59,19 +58,17 @@ void Semaphore::sleep()
     // O metodo sleep() deve colocar a Thread que nao conseguir acessar o semaforo para dormir e
     // mudar seu estado para WAITING (note que WAITING eh diferente de SUSPENDED do trabalho anterior).
     // A Thread deve ser colocada na fila de dormindo do semaforo.
-
     db<Semaphore>(TRC) << "Semaphore::sleep called to Thread "<< Thread::_running->id() << "\n";
-
-    _asleep.push(Thread::_running);
+    _asleep.insert(&Thread::_running->_link);
     Thread::_running->sleep(&_asleep);
 }
 
 void Semaphore::wakeup(bool reschedule)
 {
+
     if (!_asleep.empty())
     {
-        Thread* thread_to_wakeup = _asleep.front();
-        _asleep.pop();
+        Thread* thread_to_wakeup = _asleep.remove()->object();
         thread_to_wakeup->wakeup(reschedule);
     }
 }
@@ -80,7 +77,6 @@ void Semaphore::wakeup_all()
 {
     // O metodo wakeup_all() deve acordar todas as Thread que estavam dormindo no semaforo.
     db<Semaphore>(TRC) << "Semaphore::wakeup_all called" << "\n";
-
     while (!_asleep.empty())
     {
         wakeup();

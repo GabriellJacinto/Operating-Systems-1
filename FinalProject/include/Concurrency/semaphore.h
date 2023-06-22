@@ -12,7 +12,7 @@ __BEGIN_API
 class Semaphore
 {
 public:
-    typedef std::queue<Thread*> Asleep_Queue;
+    typedef Ordered_List<Thread> Asleep_Queue;
 
     Semaphore(int v = 1) : _value(v) {}
     ~Semaphore();

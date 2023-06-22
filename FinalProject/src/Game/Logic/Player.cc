@@ -137,13 +137,13 @@ void Player::updateSprite()
 
 void Player::move(double diffTime)
 {
-    //Player::moveSemaphore->p();
+    Player::moveSemaphore->p();
     this->previousPosition = this->position;
     this->position = this->position + this->speed * diffTime;
     this->speed = Vector(0, 0);
     this->updateSprite();
     this->handleOutOfBounds();
-    //Player::moveSemaphore->v();
+    Player::moveSemaphore->v();
 }
 
 void Player::collide(int damage)
