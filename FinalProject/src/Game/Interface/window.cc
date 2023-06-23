@@ -57,9 +57,17 @@ inline void Window::drawInfo()
 {
     Info* info = BrickShooter::info;
 
+    Info::scoreSemaphore->p();
     int score = info->score;
+    Info::scoreSemaphore->v();
+
+    Info::levelSemaphore->p();
     int level = info->level;
+    Info::levelSemaphore->v();
+
+    Info::livesSemaphore->p();
     int lives = info->lives;
+    Info::livesSemaphore->v();
 
     sf::Text infoText;
     infoText.setFont(font);

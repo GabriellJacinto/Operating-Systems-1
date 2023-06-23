@@ -123,7 +123,10 @@ void BrickShooter::init()
 bool BrickShooter::shouldLevelUp()
 {
     killedEnemies++;
-    return (killedEnemies == Config::enemiesPerLevel && info->level+1 <= Config::maxLevel);
+    Info::levelSemaphore->p();
+    int level = info->level;
+    Info::levelSemaphore->v();
+    return (killedEnemies == Config::enemiesPerLevel && level+1 <= Config::maxLevel);
 }
 
 void BrickShooter::increaseScore()
@@ -145,9 +148,17 @@ void BrickShooter::restart()
 {
     killedEnemies = 0;
 
+    Info::livesSemaphore->p();
     info->lives = Config::lives;
+    Info::livesSemaphore->v();
+
+    Info::scoreSemaphore->p();
     info->score = 0;
+    Info::scoreSemaphore->v();
+
+    Info::levelSemaphore->p();
     info->level = 1;
+    Info::levelSemaphore->v();
 
     player->removeFromGame();
     player->insertInGame();

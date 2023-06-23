@@ -30,7 +30,6 @@ void Semaphore::v()
     // uma Thread que estiver dormindo no semaforo.
 
     db<Semaphore>(TRC) << "Semaphore::v called" << "\n";
-
     // PRECISA GARANTIR ATOMICIDADE.
     if(finc(_value) < 0)
     {

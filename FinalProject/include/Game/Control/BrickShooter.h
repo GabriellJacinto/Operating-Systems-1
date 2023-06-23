@@ -24,7 +24,7 @@ public:
     static void end();
 
     static void restart();
-    static void pause();
+    static void pause(); // REMOVE
 
     static void increaseScore();
     static void increaseLevel(const vector<Enemy*>& enemies);

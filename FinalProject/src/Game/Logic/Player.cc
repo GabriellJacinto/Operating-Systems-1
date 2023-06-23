@@ -239,7 +239,7 @@ void Player::shoot(Shot::Direction directionToShoot)
                 break;
         }
 
-        Shot* shot = new Shot(shotPosition, shotDirection, true); // TEST: IS IT WORKING?
+        Shot* shot = new Shot(shotPosition, shotDirection, true);
     }
 }
 
