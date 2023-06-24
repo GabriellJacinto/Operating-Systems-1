@@ -15,6 +15,6 @@ t5/.idea
 /FinalProject/cmake_install.cmake
 /FinalProject/CMakeCache.txt
 /FinalProject/CMakeFiles/
-/FinalProject/compile_commands.json
-/FinalProject/.clang-uml
+compile_commands.json
+.clang-uml
 
