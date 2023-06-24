@@ -1,0 +1,363 @@
+[
+ {
+  "directory": "/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/src/Game/Control",
+  "arguments": [
+   "g++",
+   "-c",
+   "-w",
+   "-Wall",
+   "-Wextra",
+   "-ansi",
+   "-pedantic",
+   "-g",
+   "-I/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/include",
+   "-std=c++14",
+   "Config.cc",
+   "-o",
+   "/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/objects/Config.o"
+  ],
+  "file": "Config.cc"
+ },
+ {
+  "directory": "/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/src/Game/Control",
+  "arguments": [
+   "g++",
+   "-c",
+   "-w",
+   "-Wall",
+   "-Wextra",
+   "-ansi",
+   "-pedantic",
+   "-g",
+   "-I/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/include",
+   "-std=c++14",
+   "Clock.cc",
+   "-o",
+   "/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/objects/Clock.o"
+  ],
+  "file": "Clock.cc"
+ },
+ {
+  "directory": "/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/src/Game/Control",
+  "arguments": [
+   "g++",
+   "-c",
+   "-w",
+   "-Wall",
+   "-Wextra",
+   "-ansi",
+   "-pedantic",
+   "-g",
+   "-I/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/include",
+   "-std=c++14",
+   "BrickShooter.cc",
+   "-o",
+   "/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/objects/BrickShooter.o"
+  ],
+  "file": "BrickShooter.cc"
+ },
+ {
+  "directory": "/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/src/Game/Control",
+  "arguments": [
+   "g++",
+   "-c",
+   "-w",
+   "-Wall",
+   "-Wextra",
+   "-ansi",
+   "-pedantic",
+   "-g",
+   "-I/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/include",
+   "-std=c++14",
+   "keyboardController.cc",
+   "-o",
+   "/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/objects/keyboardController.o"
+  ],
+  "file": "keyboardController.cc"
+ },
+ {
+  "directory": "/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/src/Game/Interface",
+  "arguments": [
+   "g++",
+   "-c",
+   "-w",
+   "-Wall",
+   "-Wextra",
+   "-ansi",
+   "-pedantic",
+   "-g",
+   "-I/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/include",
+   "-std=c++14",
+   "Sounds.cc",
+   "-o",
+   "/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/objects/Sounds.o"
+  ],
+  "file": "Sounds.cc"
+ },
+ {
+  "directory": "/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/src/Game/Interface",
+  "arguments": [
+   "g++",
+   "-c",
+   "-w",
+   "-Wall",
+   "-Wextra",
+   "-ansi",
+   "-pedantic",
+   "-g",
+   "-I/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/include",
+   "-std=c++14",
+   "window.cc",
+   "-o",
+   "/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/objects/window.o"
+  ],
+  "file": "window.cc"
+ },
+ {
+  "directory": "/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/src/Game/Logic",
+  "arguments": [
+   "g++",
+   "-c",
+   "-w",
+   "-Wall",
+   "-Wextra",
+   "-ansi",
+   "-pedantic",
+   "-g",
+   "-I/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/include",
+   "-std=c++14",
+   "Player.cc",
+   "-o",
+   "/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/objects/Player.o"
+  ],
+  "file": "Player.cc"
+ },
+ {
+  "directory": "/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/src/Game/Logic",
+  "arguments": [
+   "g++",
+   "-c",
+   "-w",
+   "-Wall",
+   "-Wextra",
+   "-ansi",
+   "-pedantic",
+   "-g",
+   "-I/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/include",
+   "-std=c++14",
+   "Info.cc",
+   "-o",
+   "/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/objects/Info.o"
+  ],
+  "file": "Info.cc"
+ },
+ {
+  "directory": "/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/src/Game/Logic",
+  "arguments": [
+   "g++",
+   "-c",
+   "-w",
+   "-Wall",
+   "-Wextra",
+   "-ansi",
+   "-pedantic",
+   "-g",
+   "-I/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/include",
+   "-std=c++14",
+   "Shot.cc",
+   "-o",
+   "/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/objects/Shot.o"
+  ],
+  "file": "Shot.cc"
+ },
+ {
+  "directory": "/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/src/Game/Logic",
+  "arguments": [
+   "g++",
+   "-c",
+   "-w",
+   "-Wall",
+   "-Wextra",
+   "-ansi",
+   "-pedantic",
+   "-g",
+   "-I/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/include",
+   "-std=c++14",
+   "Point.cc",
+   "-o",
+   "/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/objects/Point.o"
+  ],
+  "file": "Point.cc"
+ },
+ {
+  "directory": "/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/src/Game/Logic",
+  "arguments": [
+   "g++",
+   "-c",
+   "-w",
+   "-Wall",
+   "-Wextra",
+   "-ansi",
+   "-pedantic",
+   "-g",
+   "-I/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/include",
+   "-std=c++14",
+   "Vector.cc",
+   "-o",
+   "/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/objects/Vector.o"
+  ],
+  "file": "Vector.cc"
+ },
+ {
+  "directory": "/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/src/Game/Logic",
+  "arguments": [
+   "g++",
+   "-c",
+   "-w",
+   "-Wall",
+   "-Wextra",
+   "-ansi",
+   "-pedantic",
+   "-g",
+   "-I/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/include",
+   "-std=c++14",
+   "CollisionHandler.cc",
+   "-o",
+   "/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/objects/CollisionHandler.o"
+  ],
+  "file": "CollisionHandler.cc"
+ },
+ {
+  "directory": "/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/src/Game/Logic",
+  "arguments": [
+   "g++",
+   "-c",
+   "-w",
+   "-Wall",
+   "-Wextra",
+   "-ansi",
+   "-pedantic",
+   "-g",
+   "-I/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/include",
+   "-std=c++14",
+   "Enemy.cc",
+   "-o",
+   "/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/objects/Enemy.o"
+  ],
+  "file": "Enemy.cc"
+ },
+ {
+  "directory": "/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/src/Concurrency",
+  "arguments": [
+   "g++",
+   "-c",
+   "-w",
+   "-Wall",
+   "-Wextra",
+   "-ansi",
+   "-pedantic",
+   "-g",
+   "-I/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/include",
+   "-std=c++14",
+   "system.cc",
+   "-o",
+   "/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/objects/system.o"
+  ],
+  "file": "system.cc"
+ },
+ {
+  "directory": "/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/src/Concurrency",
+  "arguments": [
+   "g++",
+   "-c",
+   "-w",
+   "-Wall",
+   "-Wextra",
+   "-ansi",
+   "-pedantic",
+   "-g",
+   "-I/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/include",
+   "-std=c++14",
+   "cpu.cc",
+   "-o",
+   "/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/objects/cpu.o"
+  ],
+  "file": "cpu.cc"
+ },
+ {
+  "directory": "/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/src/Concurrency",
+  "arguments": [
+   "g++",
+   "-c",
+   "-w",
+   "-Wall",
+   "-Wextra",
+   "-ansi",
+   "-pedantic",
+   "-g",
+   "-I/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/include",
+   "-std=c++14",
+   "debug.cc",
+   "-o",
+   "/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/objects/debug.o"
+  ],
+  "file": "debug.cc"
+ },
+ {
+  "directory": "/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/src/Concurrency",
+  "arguments": [
+   "g++",
+   "-c",
+   "-w",
+   "-Wall",
+   "-Wextra",
+   "-ansi",
+   "-pedantic",
+   "-g",
+   "-I/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/include",
+   "-std=c++14",
+   "thread.cc",
+   "-o",
+   "/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/objects/thread.o"
+  ],
+  "file": "thread.cc"
+ },
+ {
+  "directory": "/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/src/Concurrency",
+  "arguments": [
+   "g++",
+   "-c",
+   "-w",
+   "-Wall",
+   "-Wextra",
+   "-ansi",
+   "-pedantic",
+   "-g",
+   "-I/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/include",
+   "-std=c++14",
+   "semaphore.cc",
+   "-o",
+   "/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/objects/semaphore.o"
+  ],
+  "file": "semaphore.cc"
+ },
+ {
+  "directory": "/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/src",
+  "arguments": [
+   "g++",
+   "-c",
+   "-w",
+   "-Wall",
+   "-Wextra",
+   "-ansi",
+   "-pedantic",
+   "-g",
+   "-I/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/include",
+   "-std=c++14",
+   "main.cc",
+   "-o",
+   "/home/orion23/Desktop/UFSC/23/Operating-Systems-I/FinalProject/objects/main.o"
+  ],
+  "file": "main.cc"
+ }
+]

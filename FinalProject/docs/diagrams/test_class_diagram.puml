@@ -1,0 +1,826 @@
+@startuml
+class "Traits<T>" as C_0001281175152368507519
+class C_0001281175152368507519 {
+__
+{static} +debugged : const bool
+}
+class "Traits<CPU>" as C_0000661879844028870680
+class C_0000661879844028870680 {
+__
+{static} +STACK_SIZE : const int
+{static} +debugged : const bool
+}
+class "Traits<Debug>" as C_0000621617997694051359
+class C_0000621617997694051359 {
+__
+{static} +error : const bool
+{static} +info : const bool
+{static} +trace : const bool
+{static} +warning : const bool
+}
+class "Traits<Thread>" as C_0000034682393081883701
+class C_0000034682393081883701 {
+__
+{static} +debugged : const bool
+}
+class "Traits<System>" as C_0001991314145256580316
+class C_0001991314145256580316 {
+__
+{static} +debugged : const bool
+}
+class "Traits<Main>" as C_0000791911879348606097
+class C_0000791911879348606097 {
+__
+{static} +debugged : const bool
+}
+class "Traits<Lists>" as C_0002154884574235724111
+class C_0002154884574235724111 {
+__
+{static} +debugged : const bool
+}
+class "Traits<Semaphore>" as C_0001867586295677696734
+class C_0001867586295677696734 {
+__
+{static} +debugged : const bool
+}
+abstract "Drawable" as C_0000862915689551387777
+abstract C_0000862915689551387777 {
++~Drawable() : void
+..
+{abstract} +draw(sf::RenderWindow & window, double diffTime) = 0 : void
+{abstract} +getGlobalBounds() = 0 : sf::FloatRect
+{abstract} +getPosition() = 0 : Point
+{abstract} +getSize() = 0 : int
+{abstract} +update(double diffTime) = 0 : void
+__
+}
+abstract "Collidable" as C_0000706074502538617584
+abstract C_0000706074502538617584 {
++~Collidable() : void
+..
+{abstract} +collide(int damage) = 0 : void
+{abstract} +isDead() = 0 : bool
+__
+}
+class "CPU" as C_0002194238877156354016
+class C_0002194238877156354016 {
+{static} +fdec(volatile int & number) : int
+{static} +finc(volatile int & number) : int
+{static} +switch_context(CPU::Context * from, CPU::Context * to) : int
+__
+}
+class "CPU::Context" as C_0000036436999024103024
+class C_0000036436999024103024 {
++Context() : void
++Context<Tn...>(void (*)(Tn...) func, Tn... an) : void
+-allocateStack() : void
++load() : void
++save() : void
+-setContextStack() : void
++~Context() : void
+__
+{static} -STACK_SIZE : const unsigned int
++_context : ucontext_t
+-_stack : char *
+}
+class "Debug" as C_0000158232789924331548
+class C_0000158232789924331548 {
++operator<<(const Debug::Begl & begl) : Debug &
++operator<<(const Debug::Err & err) : Debug &
++operator<<<T>(T p) : class Debug &
+__
+-_error : volatile bool
+{static} +begl : Debug::Begl
+{static} +error : Debug::Err
+}
+class "Debug::Begl" as C_0001165046712796046156
+class C_0001165046712796046156 {
+__
+}
+class "Debug::Err" as C_0000704962224129002726
+class C_0000704962224129002726 {
+__
+}
+class "Null_Debug" as C_0001461339131625108735
+class C_0001461339131625108735 {
++operator<<<T>(const T & o) : class Null_Debug &
++operator<<<T>(const T * o) : class Null_Debug &
+__
+}
+class "Select_Debug<_Bool debugged>" as C_0002165229954493231098
+class C_0002165229954493231098 {
+__
+}
+class "Select_Debug<false>" as C_0001359010998167102473
+class C_0001359010998167102473 {
+__
+}
+enum "Debug_Error" as C_0000796590555276159637
+enum C_0000796590555276159637 {
+ERR
+}
+enum "Debug_Warning" as C_0000941499532051959320
+enum C_0000941499532051959320 {
+WRN
+}
+enum "Debug_Info" as C_0001461213096308160490
+enum C_0001461213096308160490 {
+INF
+}
+enum "Debug_Trace" as C_0002294042705317063073
+enum C_0002294042705317063073 {
+TRC
+}
+class "List_Element_Rank" as C_0001708450801319321523
+class C_0001708450801319321523 {
++List_Element_Rank(int r = 0) : void
+..
++operator int() const : int
+__
+#_rank : int
+}
+class "List_Elements::Doubly_Linked_Ordered<T,R=List_Elements::Rank>" as C_0000017290665147704166
+class C_0000017290665147704166 {
++Doubly_Linked_Ordered() : void
++Doubly_Linked_Ordered(const T * o, const R & r = 0) : void
+..
++demote(const R & n = 1) : int
++next() const : List_Elements::Doubly_Linked_Ordered::Element *
++next(List_Elements::Doubly_Linked_Ordered::Element * e) : void
++object() const : T *
++prev() const : List_Elements::Doubly_Linked_Ordered::Element *
++prev(List_Elements::Doubly_Linked_Ordered::Element * e) : void
++promote(const R & n = 1) : int
++rank() const : const R &
++rank(const R & r) : void
+__
+-_next : List_Elements::Doubly_Linked_Ordered::Element *
+-_object : const T *
+-_prev : List_Elements::Doubly_Linked_Ordered::Element *
+-_rank : R
+}
+class "List_Iterators::Forward<El>" as C_0000703598764897859750
+class C_0000703598764897859750 {
+__
+}
+class "List_Iterators::Bidirecional<El>" as C_0002182859915938773300
+class C_0002182859915938773300 {
+__
+}
+class "List<T,El>" as C_0001823143232307605004
+class C_0001823143232307605004 {
++List() : void
+..
++begin() : List::Iterator
++empty() const : bool
++end() : List::Iterator
++head() : List::Element *
++insert(List::Element * e) : void
+#insert(List::Element * e, List::Element * p, List::Element * n) : void
+#insert_first(List::Element * e) : void
++insert_head(List::Element * e) : void
++insert_tail(List::Element * e) : void
+#last() const : bool
+#print_head() : void
+#print_tail() : void
++remove(List::Element * e) : List::Element *
++remove(const List::Object_Type * obj) : List::Element *
++remove() : List::Element *
++remove_head() : List::Element *
+#remove_last() : List::Element *
++remove_tail() : List::Element *
++search(const List::Object_Type * obj) : List::Element *
++size() const : unsigned int
++tail() : List::Element *
+__
+-_head : List::Element *
+-_size : unsigned int
+-_tail : List::Element *
+}
+class "Ordered_List<T,R=class List_Element_Rank,El=List_Elements::Doubly_Linked_Ordered<T, R>,_Bool relative=false>" as C_0000173798511359817931
+class C_0000173798511359817931 {
++insert(Ordered_List::Element * e) : void
++remove() : Ordered_List::Element *
++remove(Ordered_List::Element * e) : Ordered_List::Element *
++remove(const Ordered_List::Object_Type * obj) : Ordered_List::Element *
+__
+}
+class "Ordered_List<Thread>" as C_0000770552134521520058
+class C_0000770552134521520058 {
+__
+}
+class "Thread" as C_0001680851961538404518
+class C_0001680851961538404518 {
++Thread() : void
++Thread<Tn...>(void (*)(Tn...) entry, Tn... an) : void
++~Thread() : void
+..
+{static} +check_if_next_thread_is_finished() : void
++context() : Thread::Context *
+{static} +create_dispatcher_thread() : void
+{static} +create_main_thread(void (*)(void *) main) : void
+{static} +dispatcher() : void
+{static} +get_available_id() : int
+{static} +get_now_timestamp() : int
+{static} +get_thread_to_dispatch_ready() : Thread *
++id() : int
+{static} +init(void (*)(void *) main) : void
+{static} +insert_thread_link_on_ready_queue(Thread * thread) : void
++join() : int
+{static} +prepare_dispatcher_to_run_again() : void
+{static} +rank_thread_on_current_time(Thread * new_thread) : void
++resume() : void
+{static} +return_to_main() : void
+{static} +running() : Thread *
++sleep(Thread::Asleep_Queue * sleepQueue) : void
++suspend() : void
+{static} +switch_context(Thread * prev, Thread * next) : int
++thread_exit(int exit_code) : void
++wakeup(bool reschedule = true) : void
+{static} +yield() : void
+__
+-_asleep : Thread::Asleep_Queue *
+{static} -_available_id : int
+-_context : Thread::Context *volatile
+{static} -_dispatcher : Thread
+-_exit_code : int
+-_id : int
+-_link : Ready_Queue::Element
+{static} -_main : Thread
+{static} -_main_context : CPU::Context
+{static} -_numOfThreads : int
+{static} -_ready : Thread::Ready_Queue
+{static} -_released_ids : std::queue<int>
+{static} -_running : Thread *
+-_state : volatile Thread::State
+{static} -_suspended : Thread::Ready_Queue
+-_waiting : Thread *
+}
+enum "Thread::State" as C_0001973447790412003405
+enum C_0001973447790412003405 {
+RUNNING
+READY
+SUSPEND
+FINISHING
+WAITING
+}
+class "Semaphore" as C_0002117321828745732620
+class C_0002117321828745732620 {
++Semaphore(int v = 1) : void
++~Semaphore() : void
+..
+-fdec(volatile int & number) : int
+-finc(volatile int & number) : int
++p() : void
+-sleep() : void
++v() : void
+-wakeup(bool reschedule = true) : void
+-wakeup_all() : void
+__
+-_asleep : Semaphore::Asleep_Queue
+-_value : volatile int
+}
+class "Config" as C_0001480886602420391356
+class C_0001480886602420391356 {
+{static} +deleteSemaphores() : void
+__
+{static} +enemiesPerLevel : int
+{static} +finished : bool
+{static} +finishedSemaphore : Semaphore *
+{static} +fps : int
+{static} +gameOver : bool
+{static} +gameOverSemaphore : Semaphore *
+{static} +infoAreaWidth : int
+{static} +lives : int
+{static} +maxLevel : int
+{static} +paused : bool
+{static} +pausedSemaphore : Semaphore *
+{static} +playableAreaHeight : int
+{static} +playableAreaWidth : int
+{static} +windowHeight : int
+{static} +windowWidth : int
+}
+class "Clock" as C_0001852475537888056637
+class C_0001852475537888056637 {
++Clock() : void
++~Clock() = default : void
+..
++getElapsedTime() : double
++restart() : void
+__
+-clock : sf::Clock
+-fps : int
+-previousTime : double
+}
+class "Window" as C_0002088574401020564036
+class C_0002088574401020564036 {
++Window() : void
++~Window() : void
+..
+{static} +addElementToDraw(Drawable * element) : void
++close() : void
+-drawBackground() : void
++drawElements(double d) : void
+-drawGameOver() : void
+-drawInfo() : void
+-drawPause() : void
++getWindow() : sf::RenderWindow *
++pause() : void
++quit() : void
+{static} +removeElementToDraw(Drawable * element) : void
++run() : void
+__
+-clock : sf::Clock
+-closed : bool
+-font : sf::Font
+{static} +infoSemaphore : Semaphore *
+-lastTime : float
+-maze_sprite : sf::Sprite
+-maze_tex : sf::Texture
+-paused : bool
+{static} -toBeDrawn : std::vector<Drawable *>
+{static} +toBeDrawnSemaphore : Semaphore *
+-window : sf::RenderWindow *
+}
+enum "Play::KeyPress" as C_0001295555880064232645
+enum C_0001295555880064232645 {
+UP
+DOWN
+RIGHT
+LEFT
+SHOOT
+QUIT
+RESTART
+PAUSE
+NONE
+}
+class "KeyboardHandler" as C_0001223286842177227068
+class C_0001223286842177227068 {
++KeyboardHandler(Window * window) : void
++~KeyboardHandler() : void
+..
++getNextKey() : KeyboardHandler::keys
+-getPressedKey() : KeyboardHandler::keys
++run() : void
+__
+-actionClock : Clock
+-eventQueue : std::queue<keys>
+{static} +eventQueueSemaphore : Semaphore *
+{static} -keyStates : std::map<sf::Keyboard::Key,bool>
++saveEvents : bool
+{static} +saveEventsSemaphore : Semaphore *
+-window : Window *
+}
+class "KeyboardHandler::keys" as C_0000998055188434710238
+class C_0000998055188434710238 {
+__
++actionKey : Play::KeyPress
++moveKey : Play::KeyPress
+}
+class "CollisionHandler" as C_0000807344745667066469
+class C_0000807344745667066469 {
++CollisionHandler() : void
++~CollisionHandler() : void
+..
+{static} +addEnemy(Enemy * enemy) : void
+{static} +addPlayer(Player * player) : void
+{static} +addShot(Shot * shot) : void
+-handleCollisions() : void
+-handleEnemyShotCollisions(Shot * shot) : void
+-handlePlayerEnemyCollisions() : void
+-handlePlayerShotCollisions(Shot * shot) : void
+-handleShotCollisions() : void
+-handleShotShotCollisions() : void
+-hasCollided(Drawable * drawable1, Drawable * drawable2) : bool
+{static} -isPointerInVector<T>(const std::vector<T *> & vec, const T * ptr) : _Bool
+{static} +removeEnemy(Enemy * enemy) : void
+{static} +removePlayer() : void
+{static} +removeShot(Shot * shot) : void
++restart() : void
++run() : void
+__
+{static} -enemies : std::vector<Enemy *>
+-enemyCollisionClock : unique_ptr<Clock>
+{static} +enemySemaphore : Semaphore *
+{static} -player : Player *
+{static} +playerSemaphore : Semaphore *
+{static} -shots : std::vector<Shot *>
+{static} +shotsSemaphore : Semaphore *
+{static} -shotsToRemove : std::vector<Shot *>
+}
+class "Vector" as C_0001889392030089538964
+class C_0001889392030089538964 {
++Vector() : void
++Vector(double a, double b) : void
++~Vector() : void
+..
++operator*(double scalar) : Vector
++operator+(Vector v) : Vector
++operator/(double scalar) : Vector
+..
++Angle(Point p, Point p2, double time) : void
++flip() : void
++length() : int
++reflectX() : void
++reflectY() : void
++rollRandom() : void
++rollRandomX() : void
++rollRandomY() : void
++rollReallyRandom() : void
+__
++x : double
++y : double
+}
+class "Point" as C_0001746325177465979880
+class C_0001746325177465979880 {
++Point() : void
++Point(double a, double b) : void
++~Point() : void
+..
++operator+(Vector v) : Point
++operator+(Point p) : Point
++operator-(Vector v) : Point
++operator-(Point p) : Vector
++operator==(Point p) : bool
+..
++distance(Point p) : double
++rollRandom() : void
++rollRandomX() : void
++rollRandomY() : void
+__
++x : double
++y : double
+}
+class "Shot" as C_0000983451988753790255
+class C_0000983451988753790255 {
++Shot(const Point & position, Shot::Direction direction, bool isPlayerShot) : void
++~Shot() = default : void
+..
++collide() : void
++draw(sf::RenderWindow & window, double diffTime) : void
++getDamage() const : int
++getGlobalBounds() : sf::FloatRect
++getIsPlayerShot() const : bool
++getPosition() : Point
++getSize() : int
++getSpeed(Shot::Direction directionOfSHot) : Vector
++handleOutOfBounds() : void
++loadAndBindTexture() : void
++move(double diffTime) : void
++removeFromGame() : void
++update(double diffTime) : void
++updateSprite() : void
+__
+-damage : int
+-direction : Shot::Direction
+-isPlayerShot : bool
+-position : Point
+-speed : Vector
+-speedFactor : double
+-sprite : sf::Sprite
+-texture : sf::Texture
+}
+enum "Shot::Direction" as C_0001751258074684894603
+enum C_0001751258074684894603 {
+LEFT
+RIGHT
+UP
+DOWN
+}
+class "Player" as C_0000725443068271602526
+class C_0000725443068271602526 {
++Player(KeyboardHandler * keyboardHandler) : void
++~Player() : void
+..
++collide(int damage) : void
++draw(sf::RenderWindow & window, double diffTime) : void
++getGlobalBounds() : sf::FloatRect
++getLife() const : int
++getPosition() : Point
++getPreviousPosition() : Point
++getSize() : int
+-handleInvulnerability(double diffTime) : void
+-handleOutOfBounds() : void
++insertInGame() : void
++isDead() : bool
++isOutOfPlay() : bool
+-loadAndBindTexture() : void
+-move(double diffTime) : void
+-processKey(Play::KeyPress key) : void
+-processKeyboardInput() : void
++removeFromGame() : void
++run() : void
++setInitialPosition(Point position) : void
++setPosition(const Point & position) : void
+-shoot(Shot::Direction direction) : void
++update(double diffTime) : void
+-updateSprite() : void
+__
+{static} -HALF_PLAYER_SIZE : int
+{static} -HIT_ANIMATION_TIME : float
+{static} -INVULNERABILITY_TIME : float
+{static} -PLAYER_SIZE : int
+{static} -PLAYER_SPEED : int
+{static} -SHOT_COOLDOWN : float
+-direction : Shot::Direction
+-drawDamagedPlayerClock : std::unique_ptr<Clock>
+{static} +invulnerabilitySemaphore : Semaphore *
+-invulnerabilityTime : float
+-invulnerable : bool
+-keyboardHandler : KeyboardHandler *
+-life : int
+{static} +lifeSemaphore : Semaphore *
+{static} +moveSemaphore : Semaphore *
+-position : Point
+-previousPosition : Point
+-shotClock : std::unique_ptr<Clock>
+-speed : Vector
+-sprite : sf::Sprite
+-texture : sf::Texture
+}
+class "Enemy" as C_0000018394915693045047
+class C_0000018394915693045047 {
++Enemy(Enemy::Algorithm algorithm, Player * player, Point position) : void
++~Enemy() : void
+..
++collide(int damage) : void
+-directionAlgorithmA() : void
+-directionAlgorithmB() : void
+-directionAlgorithmC() : void
+-directionAlgorithmD() : void
++draw(sf::RenderWindow & window, double diffTime) : void
+-getBestDirectionToAvoidEnemies() : Shot::Direction
++getCenter() : Point
++getGlobalBounds() : sf::FloatRect
++getPosition() : Point
++getPreviousPosition() : Point
++getSize() : int
+-handleOutOfBounds() : void
++insertInGame() : void
++inverseDirection() : void
++inverseDirection(Shot::Direction dir) : Shot::Direction
++isDead() : bool
+{static} -isValueInVector<T>(const std::vector<T> & vec, const T & value) : _Bool
+-loadAndBindTexture() : void
+-move(double diffTime) : void
+-processDirectionAlgorithm() : void
++run() : void
++setDirection(Shot::Direction direction) : void
++setEnemiesToAvoid(Enemy * enemy1, Enemy * enemy2, Enemy * enemy3) : void
++setPosition(const Point & position) : void
+-shoot() : void
++update(double diffTime) : void
+-updateSprite() : void
+__
+{static} -DIAGONAL_TIME : float
+{static} +ENEMY_SIZE : int
+{static} +ENEMY_SPEED : int
+{static} -HIT_ANIMATION_TIME : float
+{static} -MINIMUM_DISTANCE : int
+{static} -RANDOM_MOVE_TIME : float
+{static} -RELIVE_TIME : float
+{static} -SHOT_COOLDOWN : float
+{static} -SHOT_SPEED : Vector
+{static} -TARGET_DISTANCE : int
+-_isDead : bool
+-algorithm : Enemy::Algorithm
+{static} +avoidCollisionClock : std::unique_ptr<Clock>
+-avoidingCollision : bool
++damageGiven : int
+-diagonalClock : std::unique_ptr<Clock>
+-direction : Shot::Direction
+-drawDamagedEnemyClock : std::unique_ptr<Clock>
+-enemyToAvoid1 : Enemy *
+-enemyToAvoid2 : Enemy *
+-enemyToAvoid3 : Enemy *
+{static} +isDeadSemaphore : Semaphore *
++isStuck : bool
+{static} +moveSemaphore : Semaphore *
+-player : Player *
+-position : Point
++previousPosition : Point
+-randomMoveClock : std::unique_ptr<Clock>
+-reliveClock : std::unique_ptr<Clock>
+-shotClock : std::unique_ptr<Clock>
+-speed : Vector
+-sprite : sf::Sprite
+-texture : sf::Texture
+}
+enum "Enemy::Algorithm" as C_0001574028979090572976
+enum C_0001574028979090572976 {
+A
+B
+C
+D
+}
+class "Info" as C_0000953441964179942475
+class C_0000953441964179942475 {
++Info() : void
++~Info() : void
+..
++decreaseLives() : void
++incraseScore() : void
++increaseLevel() : void
+__
++level : int
+{static} +levelSemaphore : Semaphore *
++lives : int
+{static} +livesSemaphore : Semaphore *
++score : int
+{static} +scoreSemaphore : Semaphore *
+}
+class "BrickShooter" as C_0002088152513104581222
+class C_0002088152513104581222 {
++BrickShooter() = default : void
++~BrickShooter() = default : void
+..
+{static} -collisionHandlerThreadFunction() : void
+{static} +end() : void
+{static} -enemiesThreadFunction(int index) : void
+{static} +increaseLevel(const std::vector<Enemy *> & enemies) : void
+{static} +increaseScore() : void
+{static} +init() : void
+{static} -keyboardHandlerThreadFunction() : void
+{static} +pause() : void
+{static} +play(void * name) : void
+{static} -playerThreadFunction() : void
+{static} +restart() : void
+{static} +shouldLevelUp() : bool
+{static} -windowThreadFunction() : void
+__
+{static} -collisionHandler : CollisionHandler *
+{static} -collisionHandlerThread : Thread *
+{static} -enemies : std::vector<Enemy *>
+{static} -enemiesThreads : std::vector<Thread *>
+{static} +info : Info *
+{static} -keyboardHandler : KeyboardHandler *
+{static} -keyboardHandlerThread : Thread *
+{static} -killedEnemies : int
+{static} -player : Player *
+{static} -playerThread : Thread *
+{static} -window : Window *
+{static} -windowThread : Thread *
+}
+class "Sounds" as C_0000291281954787085092
+class C_0000291281954787085092 {
+{static} +loadSounds() : void
+{static} +playBackgroundMusic() : void
+{static} +playGameOverSound() : void
+{static} +playHitSound() : void
+{static} +playLevelUpSound() : void
+{static} +playRestartSound() : void
+{static} +playShotSound() : void
+__
+{static} -backgroundMusic : sf::Music
+{static} -gameOverSound : sf::Sound
+{static} -gameOverSoundBuffer : sf::SoundBuffer
+{static} -hitSound : sf::Sound
+{static} -hitSoundBuffer : sf::SoundBuffer
+{static} -levelUpSound : sf::Sound
+{static} -levelUpSoundBuffer : sf::SoundBuffer
+{static} -restartSound : sf::Sound
+{static} -restartSoundBuffer : sf::SoundBuffer
+{static} -shotSound : sf::Sound
+{static} -shotSoundBuffer : sf::SoundBuffer
+}
+class "System" as C_0000562110460732505861
+class C_0000562110460732505861 {
+{static} +init(void (*)(void *) main) : void
+__
+}
+class "Lists" as C_0001053976208936568602
+class C_0001053976208936568602 {
+__
+}
+class "Main" as C_0001493843329846054708
+class C_0001493843329846054708 {
+__
+}
+C_0000661879844028870680 ..> C_0002194238877156354016
+C_0000661879844028870680 ..|> C_0001281175152368507519
+C_0000621617997694051359 ..> C_0000158232789924331548
+C_0000621617997694051359 ..|> C_0001281175152368507519
+C_0000034682393081883701 ..> C_0001680851961538404518
+C_0000034682393081883701 ..|> C_0001281175152368507519
+C_0001991314145256580316 ..> C_0000562110460732505861
+C_0001991314145256580316 ..|> C_0001281175152368507519
+C_0000791911879348606097 ..> C_0001493843329846054708
+C_0000791911879348606097 ..|> C_0001281175152368507519
+C_0002154884574235724111 ..> C_0001053976208936568602
+C_0002154884574235724111 ..|> C_0001281175152368507519
+C_0001867586295677696734 ..> C_0002117321828745732620
+C_0001867586295677696734 ..|> C_0001281175152368507519
+C_0000862915689551387777 ..> C_0001746325177465979880
+C_0000862915689551387777 <|-- C_0000706074502538617584
+C_0000036436999024103024 --+ C_0002194238877156354016
+C_0001165046712796046156 --+ C_0000158232789924331548
+C_0000704962224129002726 --+ C_0000158232789924331548
+C_0000158232789924331548 <|-- C_0002165229954493231098
+C_0001359010998167102473 ..|> C_0002165229954493231098
+C_0001461339131625108735 <|-- C_0001359010998167102473
+C_0000703598764897859750 ..|> C_0000703598764897859750
+C_0002182859915938773300 ..|> C_0002182859915938773300
+C_0001823143232307605004 ..> C_0002182859915938773300
+C_0001823143232307605004 <|-- C_0000173798511359817931
+C_0000770552134521520058 ..> C_0001680851961538404518
+C_0000770552134521520058 ..|> C_0000173798511359817931
+C_0001680851961538404518 --> C_0001680851961538404518 : -_asleep
+C_0001680851961538404518 --> C_0000770552134521520058 : -_asleep
+C_0001680851961538404518 --> C_0001680851961538404518 : -_waiting
+C_0001680851961538404518 --> C_0001680851961538404518 : -_running
+C_0001680851961538404518 --> C_0001680851961538404518 : -_main
+C_0001680851961538404518 --> C_0001680851961538404518 : -_dispatcher
+C_0001680851961538404518 --> C_0001680851961538404518 : -_ready
+C_0001680851961538404518 --> C_0001680851961538404518 : -_suspended
+C_0001680851961538404518 <.. C_0002117321828745732620 : +<<friend>>
+C_0001973447790412003405 --+ C_0001680851961538404518
+C_0002117321828745732620 o-- C_0000770552134521520058 : -_asleep
+C_0001480886602420391356 --> C_0002117321828745732620 : +finishedSemaphore
+C_0001480886602420391356 --> C_0002117321828745732620 : +pausedSemaphore
+C_0001480886602420391356 --> C_0002117321828745732620 : +gameOverSemaphore
+C_0002088574401020564036 ..> C_0000862915689551387777
+C_0002088574401020564036 --> C_0002117321828745732620 : +toBeDrawnSemaphore
+C_0002088574401020564036 --> C_0002117321828745732620 : +infoSemaphore
+C_0002088574401020564036 --> C_0000862915689551387777 : -toBeDrawn
+C_0001223286842177227068 ..> C_0002088574401020564036
+C_0001223286842177227068 --> C_0002088574401020564036 : -window
+C_0001223286842177227068 o-- C_0001852475537888056637 : -actionClock
+C_0001223286842177227068 --> C_0002117321828745732620 : +eventQueueSemaphore
+C_0001223286842177227068 --> C_0002117321828745732620 : +saveEventsSemaphore
+C_0000998055188434710238 --+ C_0001223286842177227068
+C_0000998055188434710238 o-- C_0001295555880064232645 : +moveKey
+C_0000998055188434710238 o-- C_0001295555880064232645 : +actionKey
+C_0000807344745667066469 ..> C_0000018394915693045047
+C_0000807344745667066469 ..> C_0000983451988753790255
+C_0000807344745667066469 ..> C_0000725443068271602526
+C_0000807344745667066469 ..> C_0000862915689551387777
+C_0000807344745667066469 o-- C_0001852475537888056637 : -enemyCollisionClock
+C_0000807344745667066469 --> C_0002117321828745732620 : +playerSemaphore
+C_0000807344745667066469 --> C_0002117321828745732620 : +enemySemaphore
+C_0000807344745667066469 --> C_0002117321828745732620 : +shotsSemaphore
+C_0000807344745667066469 --> C_0000018394915693045047 : -enemies
+C_0000807344745667066469 --> C_0000725443068271602526 : -player
+C_0000807344745667066469 --> C_0000983451988753790255 : -shots
+C_0000807344745667066469 --> C_0000983451988753790255 : -shotsToRemove
+C_0001889392030089538964 ..> C_0001746325177465979880
+C_0001746325177465979880 ..> C_0001889392030089538964
+C_0000983451988753790255 ..> C_0001746325177465979880
+C_0000983451988753790255 ..> C_0001889392030089538964
+C_0000983451988753790255 o-- C_0001746325177465979880 : -position
+C_0000983451988753790255 o-- C_0001889392030089538964 : -speed
+C_0000862915689551387777 <|-- C_0000983451988753790255
+C_0001751258074684894603 --+ C_0000983451988753790255
+C_0000725443068271602526 ..> C_0001223286842177227068
+C_0000725443068271602526 ..> C_0001746325177465979880
+C_0000725443068271602526 ..> C_0001295555880064232645
+C_0000725443068271602526 --> C_0001223286842177227068 : -keyboardHandler
+C_0000725443068271602526 o-- C_0001852475537888056637 : -shotClock
+C_0000725443068271602526 o-- C_0001746325177465979880 : -previousPosition
+C_0000725443068271602526 o-- C_0001852475537888056637 : -drawDamagedPlayerClock
+C_0000725443068271602526 o-- C_0001889392030089538964 : -speed
+C_0000725443068271602526 o-- C_0001746325177465979880 : -position
+C_0000725443068271602526 --> C_0002117321828745732620 : +lifeSemaphore
+C_0000725443068271602526 --> C_0002117321828745732620 : +invulnerabilitySemaphore
+C_0000725443068271602526 --> C_0002117321828745732620 : +moveSemaphore
+C_0000725443068271602526 <.. C_0000983451988753790255 : +<<friend>>
+C_0000725443068271602526 <.. C_0000018394915693045047 : +<<friend>>
+C_0000706074502538617584 <|-- C_0000725443068271602526
+C_0000018394915693045047 ..> C_0000725443068271602526
+C_0000018394915693045047 ..> C_0001746325177465979880
+C_0000018394915693045047 o-- C_0001746325177465979880 : +previousPosition
+C_0000018394915693045047 o-- C_0001852475537888056637 : -shotClock
+C_0000018394915693045047 o-- C_0001852475537888056637 : -reliveClock
+C_0000018394915693045047 o-- C_0001852475537888056637 : -diagonalClock
+C_0000018394915693045047 o-- C_0001852475537888056637 : -randomMoveClock
+C_0000018394915693045047 o-- C_0001852475537888056637 : -drawDamagedEnemyClock
+C_0000018394915693045047 --> C_0000018394915693045047 : -enemyToAvoid1
+C_0000018394915693045047 --> C_0000018394915693045047 : -enemyToAvoid2
+C_0000018394915693045047 --> C_0000018394915693045047 : -enemyToAvoid3
+C_0000018394915693045047 --> C_0000725443068271602526 : -player
+C_0000018394915693045047 o-- C_0001889392030089538964 : -speed
+C_0000018394915693045047 o-- C_0001746325177465979880 : -position
+C_0000018394915693045047 --> C_0002117321828745732620 : +isDeadSemaphore
+C_0000018394915693045047 --> C_0002117321828745732620 : +moveSemaphore
+C_0000018394915693045047 --> C_0001852475537888056637 : +avoidCollisionClock
+C_0000018394915693045047 --> C_0001889392030089538964 : -SHOT_SPEED
+C_0000706074502538617584 <|-- C_0000018394915693045047
+C_0001574028979090572976 --+ C_0000018394915693045047
+C_0000953441964179942475 --> C_0002117321828745732620 : +scoreSemaphore
+C_0000953441964179942475 --> C_0002117321828745732620 : +livesSemaphore
+C_0000953441964179942475 --> C_0002117321828745732620 : +levelSemaphore
+C_0002088152513104581222 ..> C_0000018394915693045047
+C_0002088152513104581222 --> C_0000953441964179942475 : +info
+C_0002088152513104581222 --> C_0000725443068271602526 : -player
+C_0002088152513104581222 --> C_0001223286842177227068 : -keyboardHandler
+C_0002088152513104581222 --> C_0000807344745667066469 : -collisionHandler
+C_0002088152513104581222 --> C_0002088574401020564036 : -window
+C_0002088152513104581222 --> C_0000018394915693045047 : -enemies
+C_0002088152513104581222 --> C_0001680851961538404518 : -playerThread
+C_0002088152513104581222 --> C_0001680851961538404518 : -collisionHandlerThread
+C_0002088152513104581222 --> C_0001680851961538404518 : -keyboardHandlerThread
+C_0002088152513104581222 --> C_0001680851961538404518 : -windowThread
+C_0002088152513104581222 --> C_0001680851961538404518 : -enemiesThreads
+
+'Generated with clang-uml, version 0.3.7
+'LLVM version Ubuntu clang version 12.0.0-3ubuntu1~20.04.5
+@enduml
