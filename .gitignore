@@ -15,4 +15,4 @@ t5/.idea
 /FinalProject/cmake_install.cmake
 /FinalProject/CMakeCache.txt
 /FinalProject/CMakeFiles/
-3_sequence.puml
+*.puml
