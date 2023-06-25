@@ -1,0 +1,46 @@
+# Change to directory where compile_commands.json is
+compilation_database_dir: .
+# Change to directory where diagram should be written
+output_directory: docs/diagrams
+diagrams:
+  #test_class_diagram:
+  #  type: class
+  #  glob:
+  #    - src/*.cc
+  #    - src/Concurrency/*.cc
+  #    - src/Game/Control/*.cc
+  #    - src/Game/Interface/*.cc
+  #    - src/Game/Logic/*.cc
+  #  using_namespace:
+  #    - SOLUTION
+  #  include:
+  #    namespaces:
+  #      - SOLUTION
+  21_sequence:
+      type: sequence
+      glob:
+  #     - src/Concurrency/semaphore.cc
+        - src/Concurrency/system.cc
+        - src/Concurrency/thread.cc
+        - src/Concurrency/cpu.cc
+        - src/Game/Control/*.cc
+        - src/Game/Logic/*.cc
+      include:
+        namespaces:
+          - SOLUTION
+      using_namespace:
+        - SOLUTION
+      start_from:
+        - function: "SOLUTION::BrickShooter::play(void *)"
+      exclude:
+        namespaces:
+          - sf::*
+          - std::*
+          - List_Elements::*
+          - List_Iterators::*
+        #elements:
+        #  - SOLUTION::Debug
+        #  - SOLUTION::Semaphore
+        access:
+          - private
+      combine_free_functions_into_file_participants: true
