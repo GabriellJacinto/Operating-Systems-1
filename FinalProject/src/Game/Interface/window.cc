@@ -75,7 +75,7 @@ inline void Window::drawInfo()
     infoText.setPosition((float)Config::infoAreaWidth+75, 225);
 
     std::string infoString = "Score: " + std::to_string(score) + "\n"
-                             + "Level: " + std::to_string(level) + "\n"
+                             + "Speed: " + std::to_string(level) + "\n"
                              + "Lives: " + std::to_string(lives);
 
     infoText.setString(infoString);
