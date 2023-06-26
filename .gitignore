@@ -17,3 +17,4 @@ t5/.idea
 /FinalProject/CMakeFiles/
 *.puml
 /FinalProject/docs/old_diagrams/
+/FinalProject/compile_commands.json
