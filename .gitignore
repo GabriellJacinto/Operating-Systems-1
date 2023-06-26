@@ -16,3 +16,4 @@ t5/.idea
 /FinalProject/CMakeCache.txt
 /FinalProject/CMakeFiles/
 *.puml
+/FinalProject/docs/old_diagrams/
