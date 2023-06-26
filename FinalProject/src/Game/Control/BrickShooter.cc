@@ -2,6 +2,7 @@
 #include "Concurrency/traits.h"
 #include "SFML/Audio.hpp"
 #include "Game/Interface/Sounds.h"
+#include "Game/Logic/Point.h"
 
 __BEGIN_API
 
@@ -17,7 +18,6 @@ Thread* BrickShooter::keyboardHandlerThread;
 Thread* BrickShooter::windowThread;
 vector<Thread*> BrickShooter::enemiesThreads;
 Info* BrickShooter::info;
-#include "Game/Logic/Point.h"
 
 void BrickShooter::play(void * name)
 {
@@ -134,7 +134,7 @@ void BrickShooter::increaseScore()
     info->incraseScore();
 }
 
-void BrickShooter::increaseLevel(const vector<Enemy*>& enemiesToIncrease)
+void BrickShooter::increaseLevel()
 {
     {
         info->increaseLevel();
@@ -163,9 +163,7 @@ void BrickShooter::restart()
     player->removeFromGame();
     player->insertInGame();
 
-    //Config::gameOverSemaphore->p();
     Config::gameOver = false;
-    //Config::gameOverSemaphore->v();
 
     enemies[0]->setPosition(Point(100, 100));
     enemies[0]->previousPosition= Point(100, 100);
@@ -185,33 +183,6 @@ void BrickShooter::restart()
     Enemy::ENEMY_SPEED = 25;
 
     Sounds::playRestartSound();
-}
-
-void BrickShooter::pause()
-{
-    //Config::pausedSemaphore->p();
-
-    Config::paused = !Config::paused;
-    if (Config::paused)
-    {
-        playerThread->suspend();
-        collisionHandlerThread->suspend();
-        for (auto enemy : enemiesThreads)
-        {
-            enemy->suspend();
-        }
-    }
-    else
-    {
-        playerThread->resume();
-        collisionHandlerThread->resume();
-        for (auto enemy : enemiesThreads)
-        {
-            enemy->resume();
-        }
-    }
-
-    //Config::pausedSemaphore->v();
 }
 
 __END_API

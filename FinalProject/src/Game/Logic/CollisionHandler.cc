@@ -66,8 +66,6 @@ inline void CollisionHandler::handleCollisions()
 
 inline void CollisionHandler::handlePlayerEnemyCollisions()
 {
-   // playerSemaphore->p();
-    //enemySemaphore->p();
     if (player == nullptr || enemies.size() == 0)
         return;
     for (auto enemy : enemies)
@@ -87,9 +85,6 @@ inline void CollisionHandler::handlePlayerEnemyCollisions()
                 break;
         }
     }
-
-    //enemySemaphore->v();
-    //playerSemaphore->v();
 }
 
 inline void CollisionHandler::handleShotCollisions()
@@ -140,7 +135,7 @@ inline void CollisionHandler::handleEnemyShotCollisions(Shot* shot)
                 enemy->collide(shot->getDamage());
                 BrickShooter::increaseScore();
                 if (BrickShooter::shouldLevelUp()) {
-                    BrickShooter::increaseLevel(enemies);
+                    BrickShooter::increaseLevel();
                 }
             }
         }
@@ -167,7 +162,8 @@ inline void CollisionHandler::handlePlayerShotCollisions(SOLUTION::Shot *shot)
     }
 }
 
-// All collidable objects are squares
+/* All collidable objects are squares, thus this function detects the collision between squares.
+ * But since the ships do not move diagonally, it doesn't consider the diagonal distance between squares*/
 inline bool CollisionHandler::hasCollided(Drawable* drawable1, Drawable* drawable2)
 {
     Point pos1 = drawable1->getPosition();
@@ -187,48 +183,36 @@ inline bool CollisionHandler::hasCollided(Drawable* drawable1, Drawable* drawabl
 
 void CollisionHandler::addEnemy(Enemy* enemy)
 {
-    //enemySemaphore->p();
     enemies.push_back(enemy);
-    //enemySemaphore->v();
 }
 
 void CollisionHandler::addShot(Shot* shot)
 {
-    //shotsSemaphore->p();
     shots.push_back(shot);
-    //shotsSemaphore->v();
 }
 
 void CollisionHandler::addPlayer(Player* playerToAdd)
 {
-    //playerSemaphore->p();
     CollisionHandler::player = playerToAdd;
-    //playerSemaphore->v();
 }
 
 void CollisionHandler::removeEnemy(Enemy* enemy)
 {
-    //enemySemaphore->p();
     enemies.erase(std::remove(enemies.begin(), enemies.end(), enemy), enemies.end());
-    //enemySemaphore->v();
 }
 
 void CollisionHandler::removeShot(Shot* shot)
 {
-    //shotsSemaphore->p();
     shots.erase(std::remove(shots.begin(), shots.end(), shot), shots.end());
     if (!CollisionHandler::isPointerInVector(shotsToRemove, shot))
     {
         shotsToRemove.push_back(shot);
     }
-   //shotsSemaphore->v();
 }
 
 void CollisionHandler::removePlayer()
 {
-    //playerSemaphore->p();
     CollisionHandler::player = nullptr;
-    //playerSemaphore->v();
 }
 
 void CollisionHandler::restart()

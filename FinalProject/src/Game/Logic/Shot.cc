@@ -12,12 +12,8 @@ Shot::Shot(const Point &position, Shot::Direction direction,bool isPlayerShot)
     this->speed = getSpeed(direction);
     this->isPlayerShot = isPlayerShot;
     this->direction = direction;
-    //Window::toBeDrawnSemaphore->p();
     Window::addElementToDraw(this);
-    //Window::toBeDrawnSemaphore->v();
-    //CollisionHandler::shotsSemaphore->p();
     CollisionHandler::addShot(this);
-    //CollisionHandler::shotsSemaphore->v();
     loadAndBindTexture();
     Sounds::playShotSound();
 }
@@ -94,12 +90,8 @@ void Shot::handleOutOfBounds()
 
 void Shot::removeFromGame()
 {
-    //Window::toBeDrawnSemaphore->p();
     Window::removeElementToDraw(this);
-    //Window::toBeDrawnSemaphore->v();
-    //CollisionHandler::shotsSemaphore->p();
     CollisionHandler::removeShot(this);
-    //CollisionHandler::shotsSemaphore->v();
 }
 
 Point Shot::getPosition()

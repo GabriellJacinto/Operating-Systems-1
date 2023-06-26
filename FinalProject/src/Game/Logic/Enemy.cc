@@ -62,12 +62,8 @@ void Enemy::insertInGame()
         return;
     }
     _isDead = false;
-    //Window::toBeDrawnSemaphore->p();
     Window::addElementToDraw(this);
-    //Window::toBeDrawnSemaphore->v();
-    //CollisionHandler::enemySemaphore->p();
     CollisionHandler::addEnemy(this);
-    //CollisionHandler::enemySemaphore->v();
 }
 
 void Enemy::loadAndBindTexture()
@@ -83,7 +79,6 @@ void Enemy::run()
 {
     while (!Config::finished)
     {
-        //Enemy::isDeadSemaphore->p();
         if (!Config::gameOver && !Config::paused)
         {
             if (!this->_isDead) {
@@ -202,10 +197,8 @@ void Enemy::draw(sf::RenderWindow &window, double diffTime)
 
 void Enemy::collide(int damage)
 {
-    //Enemy::isDeadSemaphore->p();
     this->reliveClock->restart();
     this->_isDead = true;
-    //Enemy::isDeadSemaphore->v();
     Sounds::playHitSound();
 }
 
@@ -217,13 +210,11 @@ void Enemy::update(double diffTime)
 
 void Enemy::move(double diffTime)
 {
-    //Enemy::moveSemaphore->p();
     this->previousPosition = this->position;
     this->position = this->position + this->speed * diffTime;
     this->updateSprite();
     this->speed = Vector(0, 0);
     this->handleOutOfBounds();
-    //Enemy::moveSemaphore->v();
 }
 
 void Enemy::updateSprite()
