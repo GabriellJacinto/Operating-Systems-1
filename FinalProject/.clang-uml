@@ -75,31 +75,68 @@ diagrams:
 #        - SOLUTION::Drawable
 #        - SOLUTION::Collidable
 #        - SOLUTION::Thread::State
-  game_sequence_3:
+  game_sequence_nocpu:
       type: sequence
       glob:
+       - src/*.cc
+       - src/Concurrency/*.cc
+       - src/Game/Control/*.cc
+       - src/Game/Interface/*.cc
+       - src/Game/Logic/*.cc
         #- src/Concurrency/semaphore.cc
-        - src/Concurrency/thread.cc
-        - src/Game/Control/Clock.cc
-        - src/Game/Control/Config.cc
-        - src/Game/Control/keyboardController.cc
-        - src/Game/Logic/Player.cc
+        #- src/Concurrency/thread.cc
+        #- src/Game/Control/Clock.cc
+        #- src/Game/Control/Config.cc
+        #- src/Game/Control/keyboardController.cc
+        #- src/Game/Logic/Player.cc
       include:
         namespaces:
           - SOLUTION
       using_namespace:
         - SOLUTION
       start_from:
-        - function: "SOLUTION::Player::run()"
+        - function: "SOLUTION::BrickShooter::play(void *)"
+        #- function: "SOLUTION::Player::run()" 
+        #- function: "SOLUTION::KeyboardHandler::run()" 
+        #- function: "SOLUTION::Window::run()" 
+        #- function: "SOLUTION::CollisionHandler::run()"
+        #- function: "SOLUTION::Enemy::run()"
       exclude:
         namespaces:
           - sf::*
           - std::*
           - List_Elements::*
           - List_Iterators::*
-        #elements:
-        #  - SOLUTION::Debug
-        #  - SOLUTION::Semaphore
+        elements:
+         - SOLUTION::Debug
+         - SOLUTION::List_Element_Rank
+         - SOLUTION::List_Elements::Doubly_Linked_Ordered
+         #- SOLUTION::Traits
+         - SOLUTION::Debug_Error
+         - SOLUTION::Debug_Trace
+         - SOLUTION::Debug_Warning
+         - SOLUTION::Debug_Info
+         - SOLUTION::Debug::Err
+         - SOLUTION::Debug::Begl
+         #- SOLUTION::System
+         #- SOLUTION::Main
+         - SOLUTION::Lists
+         - SOLUTION::Null_Debug
+         - SOLUTION::Select_Debug
+         - SOLUTION::List_Iterators::Forward
+         - SOLUTION::List_Iterators::Bidirecional
+         #- SOLUTION::Enemy::Algorithm
+         #- SOLUTION::Shot::Direction
+         - SOLUTION::CPU::Context
+         - SOLUTION::Thread
+         - SOLUTION::CPU
+         #- SOLUTION::Play::KeyPress
+         - SOLUTION::List
+         - SOLUTION::Ordered_List
+         #- SOLUTION::Drawable
+         #- SOLUTION::Collidable
+         #- SOLUTION::Thread::State
+         - r: '.*db.*'
         access:
-          - private
-      combine_free_functions_into_file_participants: true
+         - private
+      #combine_free_functions_into_file_participants: true
