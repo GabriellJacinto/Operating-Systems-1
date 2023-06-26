@@ -1,12 +1,3 @@
-/**
- *  @file Vector.h
- *  @brief Definition of the Vector class
- *
- *
- *  @author Cody Barnson
- *  @bug No known bugs
- */
-
 #ifndef VECTOR_H
 #define VECTOR_H
 

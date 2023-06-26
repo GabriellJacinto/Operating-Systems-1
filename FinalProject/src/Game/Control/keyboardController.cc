@@ -33,42 +33,27 @@ void KeyboardHandler::run()
 
         if (key.actionKey == Play::KeyPress::QUIT)
         {
-            //Config::finishedSemaphore->p();
             Config::finished = true;
-            //Config::finishedSemaphore->v();
 
             window->quit();
         }
         else if (key.actionKey == Play::KeyPress::PAUSE && !Config::gameOver)
         {
-            //Config::pausedSemaphore->p();
-            //Config::pausedSemaphore->v();
-            //saveEventsSemaphore->p();
             saveEvents = !saveEvents;
-            //saveEventsSemaphore->v();
-            //BrickShooter::pause();
             Config::paused = !Config::paused;
             window->pause();
         }
         else if (key.actionKey == Play::KeyPress::RESTART)
         {
-            //Config::gameOverSemaphore->p();
             Config::gameOver = false;
-            //Config::gameOverSemaphore->v();
             BrickShooter::restart();
         }
         else if (key.moveKey != Play::KeyPress::NONE || key.actionKey != Play::KeyPress::NONE)
         {
-            //eventQueueSemaphore->p();
-            //saveEventsSemaphore->p();
-
             if (saveEvents)
             {
                 eventQueue.push(key);
             }
-
-            //saveEventsSemaphore->v();
-            //eventQueueSemaphore->v();
         }
         Thread::yield();
     }
@@ -112,9 +97,7 @@ inline KeyboardHandler::keys KeyboardHandler::getPressedKey()
     switch (event.type)
     {
         case sf::Event::Closed:
-            //Config::finishedSemaphore->p();
             Config::finished = true;
-            //Config::finishedSemaphore->v();
             window->close();
             break;
         case sf::Event::KeyPressed:

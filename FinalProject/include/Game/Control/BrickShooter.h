@@ -21,13 +21,11 @@ public:
 
     static void play(void * name);
     static void init();
-    static void end();
 
     static void restart();
-    static void pause(); // REMOVE
 
     static void increaseScore();
-    static void increaseLevel(const vector<Enemy*>& enemies);
+    static void increaseLevel();
 
     static bool shouldLevelUp();
     static Info* info;

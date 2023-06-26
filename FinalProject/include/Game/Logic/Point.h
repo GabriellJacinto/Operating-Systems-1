@@ -2,17 +2,6 @@
 #ifndef _POINT_H
 #define _POINT_H
 
-/**
- * @file Point.h
- * @brief Definition of the Point struct
- *
- * This contains the public member variables of the Point struct
- * describes a position on a grid
- *
- * @author Cody Barnson
- * @bug No known bugs
- */
-
 #include <cmath>
 #include <ctime>
 #include <cstdlib>

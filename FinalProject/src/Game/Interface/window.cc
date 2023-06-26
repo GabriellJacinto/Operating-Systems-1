@@ -46,7 +46,6 @@ void Window::pause()
 
 inline void Window::drawElements(double d)
 {
-    //toBeDrawnSemaphore->p();
     for (Drawable* element : toBeDrawn)
     {
         element->draw(*window, d);
@@ -76,7 +75,7 @@ inline void Window::drawInfo()
     infoText.setPosition((float)Config::infoAreaWidth+75, 225);
 
     std::string infoString = "Score: " + std::to_string(score) + "\n"
-                             + "Level: " + std::to_string(level) + "\n"
+                             + "Speed: " + std::to_string(level) + "\n"
                              + "Lives: " + std::to_string(lives);
 
     infoText.setString(infoString);
@@ -119,16 +118,12 @@ void Window::drawGameOver()
 
 void Window::addElementToDraw(Drawable* element)
 {
-   // toBeDrawnSemaphore->p();
     toBeDrawn.push_back(element);
-    //toBeDrawnSemaphore->v();
 }
 
 void Window::removeElementToDraw(Drawable* element)
 {
-    //toBeDrawnSemaphore->p();
     toBeDrawn.erase(std::remove(toBeDrawn.begin(), toBeDrawn.end(), element), toBeDrawn.end());
-    //toBeDrawnSemaphore->v();
 }
 
 void Window::run()
@@ -157,19 +152,13 @@ void Window::run()
         {
             drawPause();
 
-            //infoSemaphore->p();
             drawInfo();
-            //infoSemaphore->v();
         }
         else
         {
-            //toBeDrawnSemaphore->p();
             drawElements(diffTime);
-            //toBeDrawnSemaphore->v();
 
-            //infoSemaphore->p();
             drawInfo();
-            //infoSemaphore->v();
         }
         window->display();
 
