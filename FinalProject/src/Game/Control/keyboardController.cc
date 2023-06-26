@@ -76,15 +76,15 @@ void KeyboardHandler::run()
 
 KeyboardHandler::keys KeyboardHandler::getNextKey()
 {
-    //KeyboardHandler::eventQueueSemaphore->p();
+    KeyboardHandler::eventQueueSemaphore->p();
     if (eventQueue.empty())
     {
-        //KeyboardHandler::eventQueueSemaphore->v();
+        KeyboardHandler::eventQueueSemaphore->v();
         return {Play::KeyPress::NONE, Play::KeyPress::NONE};
     }
     KeyboardHandler::keys keys = eventQueue.front();
     eventQueue.pop();
-    //KeyboardHandler::eventQueueSemaphore->v();
+    KeyboardHandler::eventQueueSemaphore->v();
 
     return keys;
 }

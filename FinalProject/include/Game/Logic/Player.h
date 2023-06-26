@@ -39,23 +39,22 @@ public:
     void setPosition(const Point& position);
     Point getPreviousPosition();
     void insertInGame();
+    sf::FloatRect getGlobalBounds() override;
+    void removeFromGame();
 
     static Semaphore* lifeSemaphore;
     static Semaphore* invulnerabilitySemaphore;
     static Semaphore* moveSemaphore;
 
-    sf::FloatRect getGlobalBounds() override;
-    void removeFromGame();
-
 private:
     friend class Enemy;
     friend class Shot;
 
-    static int HALF_PLAYER_SIZE;
     static int PLAYER_SIZE;
     static int PLAYER_SPEED;
     static float SHOT_COOLDOWN;
     static float HIT_ANIMATION_TIME;
+    static float INVULNERABILITY_TIME;
 
     KeyboardHandler* keyboardHandler;
     std::unique_ptr<Clock> shotClock;
@@ -63,7 +62,6 @@ private:
     int life = 3;
     bool invulnerable = false;
     float invulnerabilityTime; // in seconds
-    static float INVULNERABILITY_TIME;
     Point previousPosition;
 
     void move(double diffTime);

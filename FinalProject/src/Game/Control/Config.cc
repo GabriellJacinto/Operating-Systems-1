@@ -21,6 +21,30 @@ bool Config::finished = false;
 bool Config::paused = false;
 bool Config::gameOver = false;
 
+bool Config::getFinished()
+{
+    finishedSemaphore->p();
+    bool atomicFinished = Config::finished;
+    finishedSemaphore->v();
+    return atomicFinished;
+}
+
+bool Config::getGameOver()
+{
+    gameOverSemaphore->p();
+    bool atomicGameOver = Config::gameOver;
+    gameOverSemaphore->v();
+    return atomicGameOver;
+}
+
+bool Config::getPaused()
+{
+    pausedSemaphore->p();
+    bool atomicPaused = Config::paused;
+    pausedSemaphore->v();
+    return atomicPaused;
+}
+
 void Config::deleteSemaphores()
 {
     delete finishedSemaphore;

@@ -10,12 +10,12 @@
 
 __BEGIN_API
 
-int Player::HALF_PLAYER_SIZE = 24;
 int Player::PLAYER_SIZE = 48;
 int Player::PLAYER_SPEED = 250;
 float Player::SHOT_COOLDOWN = 200;
 float Player::INVULNERABILITY_TIME = 3.0;
 float Player::HIT_ANIMATION_TIME = 20;
+
 Semaphore* Player::lifeSemaphore = new Semaphore();
 Semaphore* Player::invulnerabilitySemaphore = new Semaphore();
 Semaphore* Player::moveSemaphore = new Semaphore();
@@ -44,12 +44,8 @@ Player::~Player()
 void Player::insertInGame()
 {
     this->life = 3;
-    //Window::toBeDrawnSemaphore->p();
     Window::addElementToDraw(this);
-    //Window::toBeDrawnSemaphore->v();
-    //CollisionHandler::playerSemaphore->p();
     CollisionHandler::addPlayer(this);
-    //CollisionHandler::playerSemaphore->v();
     this->keyboardHandler->saveEvents = true;
     this->position = Point((float)Config::playableAreaWidth / 2, (float)Config::playableAreaHeight / 2);
     this->updateSprite();
@@ -67,9 +63,9 @@ void Player::loadAndBindTexture()
 
 void Player::run()
 {
-    while (!Config::finished)
+    while (!Config::getFinished())
     {
-        if (!Config::gameOver && !Config::paused)
+        if (!Config::getGameOver() && !Config::getPaused())
         {
             this->processKeyboardInput();
         }
@@ -179,7 +175,6 @@ bool Player::isDead()
 }
 
 inline void Player::processKeyboardInput() {
-    //KeyboardHandler::eventQueueSemaphore->p();
     KeyboardHandler::keys eventToProcess = this->keyboardHandler->getNextKey();
 
     Play::KeyPress event1 = eventToProcess.moveKey;
@@ -212,7 +207,6 @@ void Player::processKey(Play::KeyPress eventToProcess)
             this->shoot(this->direction);
             break;
     }
-    //KeyboardHandler::eventQueueSemaphore->v();
 }
 
 void Player::shoot(Shot::Direction directionToShoot)
@@ -260,12 +254,8 @@ Point Player::getPosition()
 
 void Player::removeFromGame()
 {
-    //Window::toBeDrawnSemaphore->p();
     Window::removeElementToDraw(this);
-    //Window::toBeDrawnSemaphore->v();
-    //CollisionHandler::playerSemaphore->p();
     CollisionHandler::removePlayer();
-    //CollisionHandler::playerSemaphore->v();
     this->keyboardHandler->saveEvents = false;
 }
 
