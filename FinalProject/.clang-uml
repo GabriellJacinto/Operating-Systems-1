@@ -95,8 +95,8 @@ diagrams:
       using_namespace:
         - SOLUTION
       start_from:
-        - function: "SOLUTION::BrickShooter::play(void *)"
-        #- function: "SOLUTION::Player::run()" 
+        #- function: "SOLUTION::BrickShooter::play(void *)"
+        - function: "SOLUTION::Player::run()" 
         #- function: "SOLUTION::KeyboardHandler::run()" 
         #- function: "SOLUTION::Window::run()" 
         #- function: "SOLUTION::CollisionHandler::run()"
